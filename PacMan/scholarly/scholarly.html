@@ -1,0 +1,78 @@
+<html><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Scholarly HTML</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/gameCore.js"></script>
+  
+</head>
+<body prefix="schema: http://schema.org" onload="startGame()">
+  <header>
+    <h1>PAMAF</h1>
+  </header>
+  <div role="contentinfo">
+    <ol role="directory">
+      <li><a href="#abstract"><span>1. </span>Abstract</a></li>
+      <li><a href="#introduction"><span>2. </span>Introduction</a></li>
+      <li><a href="#User Interaction"><span>3. </span>User Interaction</a></li>
+      <li><a href="#Version Control"><span>4. </span>Version Control</a></li>
+    </ol>
+    <dl>
+      <dt>Authors</dt>
+      <dd>
+        Pantelemon Victor
+        &amp;
+        Popa Codrin
+      </dd>
+      <dt>Bugs &amp; Feedback</dt>
+      <dd>
+        <a href="https://github.com/PantelemonVictorStefan/FII-pamaf/issues">Issues and PRs welcome!</a>
+      </dd>
+    </dl>
+  </div>
+  <section typeof="sa:Abstract" id="abstract" role="doc-abstract">
+    <h2><span>1. </span>Abstract</h2>
+    <p>
+      PAMAF is basicly a pacman game which takes places on the hallways of the faculty of computer scinece Alexandru Ioan Cuza from Iasi.
+    </p>
+  </section>
+  <section id="introduction" role="doc-introduction">
+    <!-- review? -->
+    <h2><span>2. </span>Concept</h2>
+    
+    <p>
+      Before starting to work on the project each of the developers had to come up with an idea of design for the main page and then compare with the other designs and pick one.
+    </p>
+    <h3>Design 1:</h3>
+    <img src="images/abordare1.png" style="height:600px;width: 800px"/>
+    <h3>Design 2:</h3>
+    <img src="images/abordare2.png" style="height:600px;width: 800px"/>
+    <p>A lot of research was done on the technical side of javascript games and taking the w3schools courses the following prototype came out:</p>
+    <canvas></canvas>
+    <p>(WASD to move)</p>
+  </section>
+  <section id="User Interaction">
+    <!-- review? -->
+    <h2><span>3. </span>User Interaction</h2>
+    <p>
+      After successfully authenticating with facebook the user will find himself in the
+      bidimensional hallways of the body C wandering through 
+      multiple laboratories while being chased by teachers trying to take his soul.
+    </p>
+    <p>
+      Whenever the user feels lost in the commands or has a sudden need to know more about the game and it's creators 
+      he can quickly pause the game and check one of the sections "help" or "about" available in the header without losing the progress.
+    </p>
+    
+  </section>
+  <section id="Version Control">
+    <!-- review? -->
+    <h2><span>4. </span>Version Control</h2>
+    <p>
+      The project is stored on GitHub and the version control is done via GitHub Desktop.
+      For the moment the work is done straight on the master branch as the given tasks were not
+      complex enough to require multiple branches.
+    </p>
+  </section>
+</body>
+</html>
