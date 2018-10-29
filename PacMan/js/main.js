@@ -12,6 +12,6 @@ function hideAll()
 
 function fakeLogin()
 {
-    document.getElementsByClassName("loginBtn loginBtn--facebook")[0].style.display="none";
-    document.getElementsByTagName("canvas")[0].style.display="block";
+    document.getElementsByClassName("authentication")[0].style.display="none";
+	document.getElementsByTagName("canvas")[0].style.display="block";
 }
