@@ -13,5 +13,4 @@ function hideAll()
 function fakeLogin()
 {
     document.getElementsByClassName("authentication")[0].style.display="none";
-	document.getElementsByTagName("canvas")[0].style.display="block";
 }
