@@ -79,18 +79,18 @@ a
 }
 
 .main{
-  background: grey;
-  height: 100%;
-  width: 50%;
   margin: auto;
+  background: grey;
+  width: 800px;
+  height: 100%;
 }
 
 .canvas{ 
-  margin: auto;
-  margin-top:10%;
+  margin-top:55px;
+  width: 75%;
+  margin-left: 10%;
   display: block;
-  width: 800px;
-  height: 600px;
+  height: 400px;
  
   background-color: black;
 }
@@ -122,14 +122,14 @@ a
 
 .authentication {
   margin: auto;
-  margin-top:-80%;
+  margin-top:-70%;
   text-align: center;
 
 }
 
 .authentication p {
-  font-size: 45px;
-  margin-left: 7%;
+  font-size: 30px;
+  margin-left: 2%;
   margin-right:7%;
   margin-top: 30%;
 }
