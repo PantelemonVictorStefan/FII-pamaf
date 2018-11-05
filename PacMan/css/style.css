@@ -33,7 +33,6 @@ a
 }
 
 .logo{
-  float: left;
   height: 80px;
   width: 250px;
   margin-left: 7%;
@@ -41,6 +40,7 @@ a
 }
 
 .header{
+  overflow: hidden;
   background-color: #1aa6b7;
 }
 
@@ -50,28 +50,18 @@ a
   float: right;
 }
 
-.menu ul{
-    display:flex;
-    list-style-type: none;
-    margin-top: 35px;
-}
 
-.menu li{
-  display: inline;
-  
-}
-
-.menu li a:hover {
+.menu a:hover {
     background-color: #111;
     color:#ffa500;
     transition-duration: 0ms;
 }
 
 .menu a{
-
-   padding: 37px 25px;
-   transition-duration: 500ms;
-
+  float: left;
+  text-align: center;
+  padding: 37px 25px;
+  transition-duration: 500ms;
 }
 
 .memu a:hover{
@@ -79,7 +69,7 @@ a
 }
 
 .main{
-  min-height: 700px; 
+  min-height: 700px;
   min-width: 900px;
   width: 50%;
   height: 100%;
@@ -88,21 +78,20 @@ a
   
 }
 
-.canvas{ 
-  margin-top:7%;
-  width: 75%;
-  margin-left: 4%;
-  display: block;
+.canvas{
+  margin: auto;
+  margin-top: 20%;
   height: 600px;
   width: 800px;
- 
+  display: block;
   background-color: black;
 }
 
 .footer{
+  width: 100%;
   background-color: #1aa6b7;
-  text-align: center;
   font-size: 20px;
+  text-align: center;
 }
 
 .footer h6{
@@ -110,7 +99,8 @@ a
 }
 
 .text{
-  width: 70vw;
+  width: 100vw;
+  width: 100%;
 }
   .help{
 		display:none;
@@ -122,23 +112,14 @@ a
 		color: white;
   }
 
-.game {
-  margin-left:2%;
-  width:800px;
-}
-
 .authentication {
-  margin-left: 10%;
-  margin-top:-75%;
+  margin-top: -30%;
   text-align: center;
 
 }
 
 .authentication p {
-  font-size: 40px;
-  margin-left: 10%;
-  margin-right:7%;
-  margin-top: 30%;
+ font-size: 37px;
 }
 
 
@@ -214,4 +195,3 @@ a
     background-color: #5B7BD5;
     background-image: linear-gradient(#5B7BD5, #4864B1);
   }
-
