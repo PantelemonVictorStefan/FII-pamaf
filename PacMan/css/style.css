@@ -69,7 +69,6 @@ a
 }
 
 .main{
-  min-height: 700px;
   min-width: 900px;
   width: 50%;
   height: 100%;
@@ -78,9 +77,13 @@ a
   
 }
 
+.game{
+  height: 600px;
+  margin: 20% 0%;
+}
+
 .canvas{
   margin: auto;
-  margin-top: 20%;
   height: 600px;
   width: 800px;
   display: block;
@@ -113,6 +116,7 @@ a
   }
 
 .authentication {
+  overflow: -webkit-paged-x;
   margin-top: -30%;
   text-align: center;
 
