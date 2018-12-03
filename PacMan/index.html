@@ -11,7 +11,7 @@
 <body>
 	<div class="container">
 	  	<header class="header">
-	  		<a href="index.html"><img class="logo" alt="Logo" src="img/logo.png"></a>
+	  		<a property="url" href="index.html"><img property="image" class="logo" alt="Logo" src="img/logo.png"></a>
 			<div class="menu">	
 				<a href="javascript:void(0);" onclick="displayMyComponent('game');">Home</a>
 				<a href="javascript:void(0);" onclick="displayMyComponent('help');">Help</a>
@@ -19,7 +19,7 @@
 			</div>
 	  	</header>
 	  	<main class="main">
-			<div class="game">
+			<div class="game" itemscope itemtype="http://schema.org/Game">
 					<canvas class="canvas"></canvas>
 					<div class="authentication">
 							<p>Autentificate cu Facebook pentru a putea juca</p>
@@ -30,22 +30,22 @@
 							</div>
 			</div>
 			
-			<div class="help text">
+			<div class="help text" itemprop="about" itemscope itemtype="http://schema.org/Thing">
 				<h2>How to move</h2>
-				<p>Most likely WASD and arrows to move and p to pause but we will see about that in the future</p>
-			<h2>How to win</h2>	
-			<p>To beat the game you must collect all of the items required to pass each subject of the current year(level) while being chased by ghosts.</p>
+					<p itemprop="description">Most likely WASD and arrows to move and p to pause but we will see about that in the future</p>
+				<h2>How to win</h2>	
+					<p itemprop="description">To beat the game you must collect all of the items required to pass each subject of the current year(level) while being chased by ghosts.</p>
 			</div>
 
-			<div class="about text">
-				<h2>About Pac-Man</h2>
-					<p>Pac-Man, stylized as PAC-MAN, is an arcade game developed by Namco and first released in Japan as Puck Man in May 1980. It was created by Japanese video game designer Toru Iwatani. It was licensed for distribution in the United States by Midway Games and released in October 1980. Immensely popular from its original release to the present day, Pac-Man is considered one of the classics of the medium, and an icon of 1980s popular culture. Upon its release, the game—and, subsequently, Pac-Man derivatives—became a social phenomenon that yielded high sales of merchandise and inspired a legacy in other media, such as the Pac-Man animated television series and the top-ten Buckner and Garcia hit single "Pac-Man Fever". The game was popular in the 1980s and 1990s and is still played in the 2010s.</p>
+			<div class="about text" itemprop="about" itemscope itemtype="http://schema.org/Thing">
+				<h2 itemprop="name">About Pac-Man</h2>
+					<p itemprop="description"><span itemprop="name">Pac-Man</span>, stylized as PAC-MAN, is an arcade game developed by Namco and first released in Japan as Puck Man in May 1980. It was created by Japanese video game designer Toru Iwatani. It was licensed for distribution in the United States by Midway Games and released in October 1980. Immensely popular from its original release to the present day, Pac-Man is considered one of the classics of the medium, and an icon of 1980s popular culture. Upon its release, the game—and, subsequently, Pac-Man derivatives—became a social phenomenon that yielded high sales of merchandise and inspired a legacy in other media, such as the Pac-Man animated television series and the top-ten Buckner and Garcia hit single "Pac-Man Fever". The game was popular in the 1980s and 1990s and is still played in the 2010s.</p>
 				<h2>Our Game (PAMAF)</h2>	
 				<p>PAMAF is basicly a pacman game which takes places on the hallways of the faculty of computer scinece Alexandru Ioan Cuza from Iasi.</p>
 			</div>
 	  		
 	  	</main>
-	  	<footer class="footer"><h6>FII PAMAF 2018 - Codrin Popa, Victor Pantelemon</h6></footer>
+	  	<footer class="footer"><h6>FII PAMAF 2018 - <span itemprop="contributor">Codrin Popa</span>, <span itemprop="contributor">Victor Pantelemon</span></h6></footer>
 	</div>
 </body>
 </html>

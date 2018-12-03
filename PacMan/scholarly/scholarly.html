@@ -1,79 +1,136 @@
 <!DOCTYPE html>
-<html lang="en"><head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Scholarly HTML</title>
-  <link rel="stylesheet" href="css/style.css">
-  <script src="js/gameCore.js"></script>
-  
-</head>
-<body prefix="schema: http://schema.org" onload="startGame()">
-  <header>
-    <h1>PAMAF</h1>
-  </header>
-  <div role="contentinfo">
-    <ol role="directory">
-      <li><a href="#abstract"><span>1. </span>Abstract</a></li>
-      <li><a href="#introduction"><span>2. </span>Introduction</a></li>
-      <li><a href="#UserInteraction"><span>3. </span>User Interaction</a></li>
-      <li><a href="#VersionControl"><span>4. </span>Version Control</a></li>
-    </ol>
-    <dl>
-      <dt>Authors</dt>
-      <dd>
-        Pantelemon Victor
-        &amp;
-        Popa Codrin
-      </dd>
-      <dt>Bugs &amp; Feedback</dt>
-      <dd>
-        <a href="https://github.com/PantelemonVictorStefan/FII-pamaf/issues">Issues and PRs welcome!</a>
-      </dd>
-    </dl>
-  </div>
-  <section typeof="sa:Abstract" id="abstract" role="doc-abstract">
-    <h2><span>1. </span>Abstract</h2>
-    <p>
-      PAMAF is basicly a pacman game which takes places on the hallways of the faculty of computer scinece Alexandru Ioan Cuza from Iasi.
-    </p>
-  </section>
-  <section id="introduction" role="doc-introduction">
-    <!-- review? -->
-    <h2><span>2. </span>Concept</h2>
-    
-    <p>
-      Before starting to work on the project each of the developers had to come up with an idea of design for the main page and then compare with the other designs and pick one.
-    </p>
-    <h3>Design 1:</h3>
-    <img alt="Abordare 1" src="images/abordare1.png" style="height:600px;width: 800px"/>
-    <h3>Design 2:</h3>
-    <img alt="Abordare 2" src="images/abordare2.png" style="height:600px;width: 800px"/>
-    <p>A lot of research was done on the technical side of javascript games and taking the w3schools courses the following prototype came out:</p>
-    <canvas></canvas>
-    <p>(WASD to move)</p>
-  </section>
-  <section id="UserInteraction">
-    <!-- review? -->
-    <h2><span>3. </span>User Interaction</h2>
-    <p>
-      After successfully authenticating with facebook the user will find himself in the
-      bidimensional hallways of the body C wandering through 
-      multiple laboratories while being chased by teachers trying to take his soul.
-    </p>
-    <p>
-      Whenever the user feels lost in the commands or has a sudden need to know more about the game and it's creators 
-      he can quickly pause the game and check one of the sections "help" or "about" available in the header without losing the progress.
-    </p>
-    
-  </section>
-  <section id="VersionControl">
-    <!-- review? -->
-    <h2><span>4. </span>Version Control</h2>
-    <p>
-      The project is stored on GitHub and the version control is done via GitHub Desktop.
-      For the moment the work is done straight on the master branch as the given tasks were not
-      complex enough to require multiple branches.
-    </p>
-  </section>
-</body>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+		<title>Scholarly HTML</title>
+		<link rel="stylesheet" href="css/style.css">
+		<script src="js/gameCore.js"></script>
+	</head>
+	<body prefix="schema: http://schema.org" onload="startGame()">
+		<article typeof="schema:ScholarlyArticle" resource="#">
+			<header>
+				<h1 property="schema:Name">PAMAF (PacMan)</h1>
+			</header>
+			<div role="contentinfo">
+				<ol role="directory">
+					<li><a href="#abstract"><span>1. </span>Abstract</a></li>
+					<li><a href="#introduction"><span>2. </span>Introduction</a></li>
+					<li><a href="#UserInteraction"><span>3. </span>User Interaction</a></li>
+					<li><a href="#VersionControl"><span>4. </span>Version Control</a></li>
+					<li><a href="#IntermediateStages"><span>5. </span>Intermediate Stages</a></li>
+					<li><a href="#DataModeling"><span>6. </span>Data Modeling & APIs</a></li>
+					<li><a href="#LocalStorage"><span>7. </span>Local Storage</a></li>
+				</ol>
+				<dl>
+					<dt>Authors</dt>
+						<ol>
+				          <li property="schema:author" typeof="sa:ContributorRole">
+				            <a property="schema:author"  typeof="schema:Person">
+				              <span property="schema:givenName">Codrin</span>
+				              <span property="schema:familyName">Popa</span>
+				            </a>
+				            
+				            <sup property="sa:roleContactPoint" typeof="schema:ContactPoint">
+				              <a property="schema:email" href="mailto:pcodrin96@gmail.com title="corresponding author">&#9993;</a>
+				            </sup>
+				          </li>
+				          <li property="schema:author" typeof="sa:ContributorRole">
+				            <a property="schema:author"  typeof="schema:Person">
+				              <span property="schema:givenName">Victor</span>
+				              <span property="schema:familyName">Pantelemon</span>
+				            </a>
+				            
+				            <sup property="sa:roleContactPoint" typeof="schema:ContactPoint">
+				              <a property="schema:email" href="mailto:pantelemonvictor@gmail.com title="corresponding author">&#9993;</a>
+				            </sup>
+				          </li>
+				        </ol>
+				        <dt>Faculty</dt>
+						<ol>
+				          <li id="faculty">
+				            <a href="https://www.info.uaic.ro/bin/Main/" typeof="schema:Faculty">
+				              <span property="schema:name">www.info.uaic.ro</span>
+				            </a>
+				          </li>
+				        </ol>
+					<dt>Bugs &amp; Feedback</dt>
+					<dd>
+						<a href="https://github.com/PantelemonVictorStefan/FII-pamaf/issues" typeof="schema:Feedback">Issues and PRs welcome!</a>
+					</dd>
+				</dl>
+			</div>
+			<section typeof="sa:Abstract" id="abstract" role="doc-abstract">
+				<h2><span>1. </span>Abstract</h2>
+				<p>
+					PAMAF is basicly a pacman game which takes places on the hallways of the faculty of computer scinece Alexandru Ioan Cuza from Iasi.
+				</p>
+			</section>
+			<section typeof="sa:Introduction" id="introduction" role="doc-introduction">
+				<h2><span>2. </span>Concept</h2>
+				<p>
+					Before starting to work on the project each of the developers had to come up with an idea of design for the main page and then compare with the other designs and pick one.
+				</p>
+				<h3>Design 1:</h3>
+				<figure typeof="sa:Image">
+					<img alt="Abordare 1" src="images/abordare1.png" style="height:600px;width: 800px"/>
+				</figure>
+				<h3>Design 2:</h3>
+				<figure typeof="sa:Image">
+					<img alt="Abordare 2" src="images/abordare2.png" style="height:600px;width: 800px"/>
+				</figure>
+				<p>A lot of research was done on the technical side of javascript games and taking the w3schools courses the following prototype came out:</p>
+				<canvas></canvas>
+				<p>(WASD to move)</p>
+			</section>
+			<section typeof="sa:UserInteraction" id="UserInteraction">
+				<h2><span>3. </span>User Interaction</h2>
+				<p>
+					After successfully authenticating with facebook the user will find himself in the
+					bidimensional hallways of the body C wandering through 
+					multiple laboratories while being chased by teachers trying to take his soul.
+				</p>
+				<p>
+					Whenever the user feels lost in the commands or has a sudden need to know more about the game and it's creators 
+					he can quickly pause the game and check one of the sections "help" or "about" available in the header without losing the progress.
+				</p>
+			</section>
+			<section typeof="sa:VersionControl" id="VersionControl">
+				<h2><span>4. </span>Version Control</h2>
+				<p>
+					The project is stored on GitHub and the version control is done via GitHub Desktop.
+					For the moment the work is done straight on the master branch as the given tasks were not
+					complex enough to require multiple branches.
+				</p>
+			</section>
+			<section typeof="sa:IntermediateStages" id="IntermediateStages">
+				<h2><span>5. </span>Intermediate Stages</h2>
+				<p>
+					In the intermediate stages we came up with the architecture of the application, the required classes and how they interact.
+				</p>
+			</section>
+			<section typeof="sa:DataModeling" id="DataModeling">
+				<h2><span>6. </span>Data modeling & APIs</h2>
+				<h3>Data modeling</h3>
+				<p>
+					On the backend we are saving to a database the player's facebook id, his progress and his score.
+					Information like the score of his friends will also be available for him.
+				</p>
+				<h3>APIs</h3>
+				<p>
+					We are using the Facebook Login API to authenticate the user. The application is registered at developers.facebook.com and it requires the permission to access user's photos and user's friends.
+				</p>
+				<h3>Microdata</h3>
+				<p>
+					As for the microdata we used the "itemscope" attribute to create data and the attribute "itemprop" to specify properties.
+				</p>
+			</section>
+			<section typeof="sa:LocalStorage" id="LocalStorage">
+				<h2><span>7. </span>Local Storage</h2>
+				<p>
+					We are using Local Web Storage to store the score and progress of the player.
+				</p>
+			</section>
+		</article>
+	</body>
 </html>
