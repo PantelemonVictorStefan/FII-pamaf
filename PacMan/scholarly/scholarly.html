@@ -119,10 +119,13 @@
 				<p>
 					On the backend we are saving to a database the player's facebook id, his progress and his score.
 					Information like the score of his friends will also be available for him.
+					Each 30 seconds the game will check if either the score or progress has changed and it will send the player's id, score and progress to our api which will store them in the database.
+					After authentication the game will download the save from the server and it will compare it's time with the save time of the local storage save and decide which one to load.
 				</p>
 				<h3>APIs</h3>
 				<p>
 					We are using the Facebook Login API to authenticate the user. The application is registered at developers.facebook.com and it requires the permission to access user's photos and user's friends.
+					Also we make ajax call to the "saveGame" and "loadGame" APIs present on the server which keeps track of the players.
 				</p>
 				<h3>Microdata</h3>
 				<p>
@@ -132,7 +135,10 @@
 			<section typeof="sa:LocalStorage" id="LocalStorage">
 				<h2><span>7. </span>Local Storage</h2>
 				<p>
-					We are using Local Web Storage to store the score and progress of the player.
+					We are using Local Web Storage to store the score and progress of the player. 
+					Each 10 seconds the class Game will update the key "currentGame" with a variable containing player's progress and score.
+					"localStorage.setItem("currentGame",JSON.stringify(gameLogic.saveFile));"
+					When the game starts it will check if the local storage contains any save file "var savedFile = localStorage.getItem('currentGame');"
 				</p>
 			</section>
 
