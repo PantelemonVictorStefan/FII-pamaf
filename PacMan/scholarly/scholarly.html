@@ -125,7 +125,17 @@
 				<h3>Microdata</h3>
 				<p>
 					As for the microdata we used the "itemscope" attribute to create data and the attribute "itemprop" to specify properties.
+					In <a href="schema.org/Thing">Schema.org</a>, everything is a Thing:
 				</p>
+				<p>This is the <code>html</code> tag:</p>
+				<pre><code><</code><code>html lang="en" itemscope itemtype="http://schema.org/Thing"</code><code>></code></pre>
+				<p>Thing has many child types, so we used itemprop with values like game, description, name, etc.</p>
+				<p>Examples:</p>
+				
+					<code>&ltdiv class="help text" itemprop="about"&gt </code></br>
+					<code>&ltdiv class="game" itemscope itemtype="http://schema.org/Game"&gt </code></br>
+					<code>&ltdiv class="about text" itemprop="about"&gt </code></br>
+					<code>&lth2 itemprop="name">About Pac-Man&lt/h2&gt</code>
 			</section>
 			<section typeof="sa:LocalStorage" id="LocalStorage">
 				<h2><span>7. </span>Local Storage</h2>
