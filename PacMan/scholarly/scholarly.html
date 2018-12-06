@@ -21,6 +21,8 @@
 					<li><a href="#IntermediateStages"><span>5. </span>Intermediate Stages</a></li>
 					<li><a href="#DataModeling"><span>6. </span>Data Modeling & APIs</a></li>
 					<li><a href="#LocalStorage"><span>7. </span>Local Storage</a></li>
+					<li><a href="#ClassDiagram"><span>8. </span>Class Diagram</a></li>
+					<li><a href="#About Classes"><span>9. </span>Implementation</a></li>
 				</ol>
 				<dl>
 					<dt>Authors</dt>
@@ -117,10 +119,13 @@
 				<p>
 					On the backend we are saving to a database the player's facebook id, his progress and his score.
 					Information like the score of his friends will also be available for him.
+					Each 30 seconds the game will check if either the score or progress has changed and it will send the player's id, score and progress to our api which will store them in the database.
+					After authentication the game will download the save from the server and it will compare it's time with the save time of the local storage save and decide which one to load.
 				</p>
 				<h3>APIs</h3>
 				<p>
 					We are using the Facebook Login API to authenticate the user. The application is registered at developers.facebook.com and it requires the permission to access user's photos and user's friends.
+					Also we make ajax call to the "saveGame" and "loadGame" APIs present on the server which keeps track of the players.
 				</p>
 				<h3>Microdata</h3>
 				<p>
@@ -140,9 +145,91 @@
 			<section typeof="sa:LocalStorage" id="LocalStorage">
 				<h2><span>7. </span>Local Storage</h2>
 				<p>
-					We are using Local Web Storage to store the score and progress of the player.
+					We are using Local Web Storage to store the score and progress of the player. 
+					Each 10 seconds the class Game will update the key "currentGame" with a variable containing player's progress and score.
+					"localStorage.setItem("currentGame",JSON.stringify(gameLogic.saveFile));"
+					When the game starts it will check if the local storage contains any save file "var savedFile = localStorage.getItem('currentGame');"
 				</p>
 			</section>
+
+			<section typeof="sa:ClassDiagram" id="ClassDiagram">
+				<h2><span>8. </span>Class Diagram</h2>
+				<img alt="Abordare 2" src="images/pacmanUML.png" style="height:600px;width: 1000px"/>
+			</section>
+
+			<section typeof="sa:AboutClasses" id="AboutClasses">
+				<h2><span>9. </span>About Classes</h2>
+				<dl>
+					<dt>Game</dt>
+					<dd>
+						<p>This is a static class responsible with canvas interaction and controls.</p>
+						<p>Methods:</p>
+						<ul>
+							<il><p>start(): initializes the game, creates canvas,defines the controls and how often to update the game content(fps)</p></il>
+							<il><p>stop(): this is a final state, specifically the game canvas will not be updated anymore after calling this method</p></il>
+							<il><p>pause(): same as the stop() method only this is not a final state and calling this method while the game is paused will unpause the game</p></il>
+							<il><p>clear(): removes all the elements from the canvas</p></il>
+							<il><p>updateGameArea(): this method calls the clear() method and then updates the canvas content accordingly to the GameLogic class </p></il>
+						</ul>
+					</dd>
+					<dt>GameLogic</dt>
+  				<dd>
+							<p>This class runs the game logic accordingly to the user input and state of the game. 
+								The game has a linear course of events and for each state there is a method to be called. 
+								Each method may change the state of the game at some point.
+							</p>
+							<p>Methods:</p>
+							<ul>
+									<il><p>The most significant method of this class is runGameLogic() which depending on the state will decide which method to call next.</p></il>
+							</ul>
+					</dd>
+					<dt>Component</dt>
+  				<dd>
+							<p>This class defines the basic properties and methods an element of the canvas has such as dimensions(width and height) and position(x and y).
+							</p>
+							<p>Methods:</p>
+							<ul>
+									<il><p>draw(): the component will draw itself on the canvas using this method</p></il>
+									<il><p>update(): the component will update it's properties using this method</p></il>
+							</ul>
+					</dd>
+					<dt>Mob</dt>
+  				<dd>
+							<p>This class extends Component class and defines all the computer controlled entities.
+							</p>
+							<p>Methods:</p>
+							<ul>
+									<il><p>doMobStuff(): this method is responsible for the artificial intelligence part. It will compute the direction the mob will go.</p></il>
+									<il><p>getcollidedPart(): this method is used by the artificial intelligence part to decide in which direction to go after the mob has collided with a wall</p></il>
+							</ul>
+					</dd>
+					
+					<dt>Player</dt>
+  				<dd>
+							<p>This class extends Component class and represents the player.</p>
+							<p>Methods:</p>
+							<ul>
+									<il><p>hascollided(): this method gets the colision type(colision with wall or mob or booster) and calls the handleColision method</p></il>
+									<il><p>getcollidedPart(): same as the mob method only used in another context</p></il>
+							</ul>
+					</dd>
+					<dt>Booster</dt>
+  				<dd>
+							<p>This class extends Collectible class which extends Component. This class has no methods and only defines collectible elements and their effects.</p>
+					</dd>
+
+					<dt>MapElement</dt>
+  				<dd>
+							<p>This class extends Component. This class has no methods and only defines fixed elements of the map like furniture and such.</p>
+					</dd>
+
+					<dt>Map</dt>
+  				<dd>
+							<p>This class represents the map. It also contains all the MapElement components and draws them over the map texture. </p>
+					</dd>
+				</dl>
+			</section>
+
 		</article>
 	</body>
 </html>
