@@ -26,12 +26,22 @@ class Game{
         this.context = this.canvas.getContext("2d");
         document.body.insertBefore(this.canvas, document.body.childNodes[0]);
         this.interval = setInterval(this.updateGameArea, 20);
+        this.mouseX=0;
+        this.mouseY=0;
         window.addEventListener('keydown', function (e) {
             myGameArea.keys = (myGameArea.keys || []);
             myGameArea.keys[e.keyCode] = true;
         })
         window.addEventListener('keyup', function (e) {
             myGameArea.keys[e.keyCode] = false;
+        })
+        window.addEventListener('mousedown', function (e) {
+            myGameArea.mouseX = e.pageX;
+            myGameArea.mouseY = e.pageY;
+        })
+        window.addEventListener('mouseup', function (e) {
+            myGameArea.mouseX = false;
+            myGameArea.mouseY = false;
         })
     }
 
@@ -67,6 +77,21 @@ class Component
         
 }
 
+class Button extends Component
+{
+    clicked () {
+        var myleft = this.x;
+        var myright = this.x + (this.width);
+        var mytop = this.y;
+        var mybottom = this.y + (this.height);
+        var clicked = true;
+        if ((mybottom < myGameArea.mouseY) || (mytop > myGameArea.mouseY) || (myright < myGameArea.mouseX) || (myleft > myGameArea.mouseX)) {
+            clicked = false;
+        }
+        return clicked;
+    }
+}
+
 class gameLogic
 {
     constructor()
@@ -85,8 +110,19 @@ class gameLogic
         if(this.state==1)
         {
             this.displayCharacter()
+            if (this.myButton.clicked())
+            {
+                console.log("button clicked");
+                this.state++;
+            }
             return 0;
         }
+        if(this.state==2)
+        {
+            this.displayMap();
+            return 0;
+        }
+        
     }
 
 
@@ -95,6 +131,7 @@ class gameLogic
         console.log("loaded character details");
         this.image=document.getElementById("myImg");
         this.avatar=document.getElementById("avatarImg");
+        this.myButton=new Button(30, 30, "red", 400, 400);
     }
     displayCharacter()
     {
@@ -102,7 +139,16 @@ class gameLogic
         myGameArea.context.drawImage(this.image, 10, 10);
         myGameArea.context.drawImage(this.avatar, 25, 135);
         myGameArea.context.font = "30px Arial";
+        myGameArea.context.fillStyle = "black";
         myGameArea.context.fillText("Hello World",120, 35);
+        this.myButton.draw();
+        
+        
+    }
+    displayMap()
+    {
+        this.image=document.getElementById("map");
+        myGameArea.context.drawImage(this.image, 0, 0);
     }
 }
 
