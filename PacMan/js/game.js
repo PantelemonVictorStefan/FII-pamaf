@@ -24,6 +24,7 @@ class Game{
         this.canvas.width = 800;
         this.canvas.height = 600;
         this.context = this.canvas.getContext("2d");
+        this.canvas.style.background="black";
         document.body.insertBefore(this.canvas, document.body.childNodes[0]);
         this.interval = setInterval(this.updateGameArea, 20);
         this.mouseX=0;
@@ -52,33 +53,32 @@ class Game{
 
 class Component
 {
-    constructor(width, height, color, x, y) 
+    constructor(width, height, x, y) 
     {
         this.width = width;
         this.height = height;
-        this.speedX = 0;
-        this.speedY = 0;
         this.x = x;
         this.y = y;
-        this.color=color;
     }    
     draw ()
     {
         this.ctx = myGameArea.context;
-        this.ctx.fillStyle = this.color;
-        this.ctx.fillRect(this.x, this.y, this.width, this.height);
     }
 
     update()
-    {
-        this.x += this.speedX;
-        this.y += this.speedY;        
+    {  
     }
         
 }
 
 class Button extends Component
 {
+    constructor(width, height, x, y,color) 
+    {
+        super(width, height, x, y);
+        this.color=color;
+    }
+
     clicked () {
         var myleft = this.x;
         var myright = this.x + (this.width);
@@ -89,6 +89,13 @@ class Button extends Component
             clicked = false;
         }
         return clicked;
+    }
+
+    draw()
+    {
+        this.ctx = myGameArea.context;
+        this.ctx.fillStyle = this.color;
+        this.ctx.fillRect(this.x, this.y, this.width, this.height);
     }
 }
 
@@ -117,9 +124,17 @@ class gameLogic
             }
             return 0;
         }
-        if(this.state==2)
+        if(this.state==2)//load ground floor map
+        {
+            this.groundFloorMap=new Map("map");
+            this.player=new Player(50,50,0,0,"player")
+            this.state++;
+            return 0;
+        }
+        if(this.state==3)//play ground floor map
         {
             this.displayMap();
+
             return 0;
         }
         
@@ -131,7 +146,7 @@ class gameLogic
         console.log("loaded character details");
         this.image=document.getElementById("myImg");
         this.avatar=document.getElementById("avatarImg");
-        this.myButton=new Button(30, 30, "red", 400, 400);
+        this.myButton=new Button(30, 30, 400, 400,"red");
     }
     displayCharacter()
     {
@@ -147,13 +162,40 @@ class gameLogic
     }
     displayMap()
     {
-        this.image=document.getElementById("map");
-        myGameArea.context.drawImage(this.image, 0, 0);
+        this.groundFloorMap.draw(0,0);
+        this.player.draw();
     }
 }
 
 
+class Map
+{
+    constructor(textureName)
+    {
+        this.image=document.getElementById(textureName);
+    }
 
+    draw(x,y)
+    {
+        myGameArea.context.drawImage(this.image,x,y);
+    }
+}
+
+class Player extends Component
+{
+    constructor(width, height, x, y,textureName) 
+    {
+        super(width, height, x, y) ;
+        this.texture=document.getElementById(textureName);
+    }
+
+    draw()
+    {
+        myGameArea.context.drawImage(this.texture,0,0);
+    }
+
+
+}
 
 //var myGamePiece;
 var myGameArea=new Game();
@@ -170,3 +212,29 @@ function startGame() {
 
 
 
+/*class Component
+{
+    constructor(width, height, color, x, y) 
+    {
+        this.width = width;
+        this.height = height;
+        this.speedX = 0;
+        this.speedY = 0;
+        this.x = x;
+        this.y = y;
+        this.color=color;
+    }    
+    draw ()
+    {
+        this.ctx = myGameArea.context;
+        this.ctx.fillStyle = this.color;
+        this.ctx.fillRect(this.x, this.y, this.width, this.height);
+    }
+
+    update()
+    {
+        this.x += this.speedX;
+        this.y += this.speedY;        
+    }
+        
+}*/
