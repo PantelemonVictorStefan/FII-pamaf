@@ -39,6 +39,7 @@ class Game{
         window.addEventListener('mousedown', function (e) {
             myGameArea.mouseX = e.pageX;
             myGameArea.mouseY = e.pageY;
+
         })
         window.addEventListener('mouseup', function (e) {
             myGameArea.mouseX = false;
@@ -77,15 +78,19 @@ class Button extends Component
     {
         super(width, height, x, y);
         this.color=color;
+        this.myleft = this.x;
+        this.myright = this.x + (this.width);
+        this.mytop = this.y;
+        this.mybottom = this.y + (this.height);
     }
 
     clicked () {
-        var myleft = this.x;
-        var myright = this.x + (this.width);
-        var mytop = this.y;
-        var mybottom = this.y + (this.height);
+        this.myleft = this.x;
+        this.myright = this.x + (this.width);
+        this.mytop = this.y;
+        this.mybottom = this.y + (this.height);
         var clicked = true;
-        if ((mybottom < myGameArea.mouseY) || (mytop > myGameArea.mouseY) || (myright < myGameArea.mouseX) || (myleft > myGameArea.mouseX)) {
+        if ((this.mybottom < myGameArea.mouseY) || (this.mytop > myGameArea.mouseY) || (this.myright < myGameArea.mouseX) || (this.myleft > myGameArea.mouseX)) {
             clicked = false;
         }
         return clicked;
@@ -126,8 +131,7 @@ class gameLogic
         }
         if(this.state==2)//load ground floor map
         {
-            this.groundFloorMap=new Map("map");
-            this.player=new Player(50,50,0,0,"player")
+            this.loadGroundLevelGame();
             this.state++;
             return 0;
         }
@@ -160,9 +164,15 @@ class gameLogic
         
         
     }
+    loadGroundLevelGame()
+    {
+        this.groundFloorMap=new Map("map");
+        this.player=new Player(50,50,375,275,"player")
+    }
     displayMap()
     {
-        this.groundFloorMap.draw(0,0);
+        this.groundFloorMap.draw(0-this.player.realY,0-this.player.realX);
+        this.player.update();
         this.player.draw();
     }
 }
@@ -187,11 +197,22 @@ class Player extends Component
     {
         super(width, height, x, y) ;
         this.texture=document.getElementById(textureName);
+        this.realX=x;
+        this.realY=y;
     }
 
     draw()
     {
-        myGameArea.context.drawImage(this.texture,0,0);
+        myGameArea.context.drawImage(this.texture,this.x,this.y);
+        //console.log(this.realX,this.realY);
+    }
+
+    update()
+    {
+    if (myGameArea.keys && myGameArea.keys[87]) {this.realX--; }
+    if (myGameArea.keys && myGameArea.keys[83]) {this.realX++; }
+    if (myGameArea.keys && myGameArea.keys[65]) {this.realY--;}
+    if (myGameArea.keys && myGameArea.keys[68]) {this.realY++; }
     }
 
 
