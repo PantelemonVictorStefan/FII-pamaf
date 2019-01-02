@@ -166,40 +166,30 @@ class gameLogic
     }
     loadGroundLevelGame()
     {
-        let matrix=[
-            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
-        ];
-        this.groundFloorMap=new Map("map",matrix);
+        let obstacles=[];
+        /*obstacles[0]=new Component(16,871-24,24,56);
+        obstacles[1]=new Component(487-56,16,24,56);
+        obstacles[2]=new Component(535-488,8,28,488);
+        obstacles[3]=new Component(1479-536,16,24,536);
+        obstacles[4]=new Component(16,231-24,24,440);
+        obstacles[5]=new Component(16,231-24,24,536);
+        obstacles[5]=new Component(16,231-24,24,664);*/
+
+        
+        obstacles[0]=new Component(731-84,24,84,84);
+        obstacles[1]=new Component(803-732,12,90,732);
+        obstacles[2]=new Component(2219-804,24,84,804);
+        obstacles[3]=new Component(24,1355-84,84,84);
+        obstacles[4]=new Component(24,395-84,84,660);
+        obstacles[5]=new Component(24,395-84,84,804);
+        obstacles[6]=new Component(24,395-84,84,996);
+        obstacles[7]=new Component(24,827-324,324,1668);
+        obstacles[8]=new Component(539-84,24,372,84);
+        obstacles[9]=new Component(611-540,12,378,540);
+        obstacles[10]=new Component(683-612,24,372,612);
+        obstacles[11]=new Component(1547-996,24,372,996);
+
+        this.groundFloorMap=new Map("map",obstacles);
         this.player=new Player(50,50,275,375,"player",this.groundFloorMap)
     }
     displayMap()
@@ -213,10 +203,10 @@ class gameLogic
 
 class Map
 {
-    constructor(textureName,matrix)
+    constructor(textureName,obstacles)
     {
         this.image=document.getElementById(textureName);
-        this.matrix=matrix;
+        this.obstacles=obstacles;
     }
 
     draw(x,y)
@@ -231,9 +221,10 @@ class Player extends Component
     {
         super(width, height, x, y) ;
         this.texture=document.getElementById(textureName);
-        this.realX=50;
-        this.realY=50;
+        this.realX=800;
+        this.realY=800;
         this.map=map;
+        this.speed=10;
     }
 
     draw()
@@ -244,50 +235,80 @@ class Player extends Component
 
     update()
     {
-    //if(this.getColidedPart()!=0)
-        //console.log(this.getColidedPart())
-    if (myGameArea.keys && myGameArea.keys[87]) {if(this.getColidedPart()[0]!=1) this.realX--; }
-    if (myGameArea.keys && myGameArea.keys[83]) {if(this.getColidedPart()[2]!=1) this.realX++; }
-    if (myGameArea.keys && myGameArea.keys[65]) {if(this.getColidedPart()[3]!=1) this.realY--;}
-    if (myGameArea.keys && myGameArea.keys[68]) {if(this.getColidedPart()[1]!=1) this.realY++; }
+        //if(this.getColidedPart()!=0)
+            //console.log(this.getColidedPart())
+        if (myGameArea.keys && myGameArea.keys[87]) 
+            {
+                for(let i=0;i<this.speed;i++)
+                    if(this.getColidedPart()[0]!=1) 
+                        this.realX--;
+                    else
+                        break;
+                
+            }
+        if (myGameArea.keys && myGameArea.keys[83])
+        {
+            for(let i=0;i<this.speed;i++) 
+                if(this.getColidedPart()[2]!=1)
+                    this.realX++;
+                else
+                    break; 
+        }
+        if (myGameArea.keys && myGameArea.keys[65]) 
+        {
+            for(let i=0;i<this.speed;i++)
+                if(this.getColidedPart()[3]!=1)
+                    this.realY--;
+                else
+                    break;
+        }
+        if (myGameArea.keys && myGameArea.keys[68])
+        {
+            for(let i=0;i<this.speed;i++)
+                if(this.getColidedPart()[1]!=1)
+                    this.realY++;
+            else
+            break;
+        }
     }
 
     getColidedPart()
-    {   
-        let ratio=31.97;
-        let x=Math.floor(this.realX/ratio);
-        let y=Math.floor(this.realY/ratio);
-        let x2=Math.floor((this.realX+this.height)/ratio);
-        let y2=Math.floor((this.realY+this.width)/ratio);
+    { 
         let colisions=[0,0,0,0];
-        //console.log(this.realX,this.realY,x,y);
-
-        
-
-        for(let i=0;i<this.width;i++)
+        for(let i=0;i<this.map.obstacles.length;i++)
         {
-            x=Math.floor((this.realX-1)/ratio);
-            y=Math.floor((this.realY+i)/ratio);
-            x2=Math.floor((this.realX+this.height+1)/ratio);
-            
-            if(this.map.matrix[x][y]==1)
-                colisions[0]=1;
-            if(this.map.matrix[x2][y]==1)
-                colisions[2]=1;
+            let obstacle=this.map.obstacles[i];
+            for(let j=0;j<this.width;j++)
+            {
+                if((this.realX+1)==(obstacle.x+obstacle.height))
+                    if(((this.realY+j)>=obstacle.y)&&((this.realY+j)<=obstacle.y+obstacle.width))
+                    {
+                        colisions[0]=1;
+                        j=this.width;
+                    }
+                if((this.realX+this.height)==(obstacle.x))
+                if(((this.realY+j)>=obstacle.y)&&((this.realY+j)<=(obstacle.y+obstacle.width)))
+                    {
+                        colisions[2]=1;
+                        j=this.width;
+                    }
+            }
+            for(let j=0;j<this.height;j++)
+            {
+                if((this.realY)==(obstacle.y+obstacle.width))
+                    if(((this.realX+j)>=obstacle.x)&&((this.realX+j)<=(obstacle.x+obstacle.height)))
+                    {
+                        colisions[3]=1;
+                        j=this.height;
+                    }
+                if((this.realY+this.width)==(obstacle.y))
+                    if(((this.realX+j)>=obstacle.x)&&((this.realX+j)<=(obstacle.x+obstacle.height)))
+                    {
+                        colisions[1]=1;
+                        j=this.height;
+                    }
+            }
         }
-        
-        for(let i=0;i<this.height;i++)
-        {
-            
-            x=Math.floor((this.realX+i)/ratio);
-            y=Math.floor((this.realY-1)/ratio);
-            y2=Math.floor((this.realY+this.width+1)/ratio);
-            if(this.map.matrix[x][y]==1)
-                colisions[3]=1;
-            if(this.map.matrix[x][y2]==1)
-                colisions[1]=1;
-        }
-        
         return colisions;
     }
 
