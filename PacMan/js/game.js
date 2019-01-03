@@ -104,6 +104,194 @@ class Button extends Component
     }
 }
 
+class Checkpoint extends Component
+{
+    constructor(width, height, x, y,id)
+    {
+        super(width,height,x,y);
+        this.id=id;
+    }
+
+    draw(x,y)
+    {
+        this.ctx=myGameArea.context;
+        this.ctx.strokeStyle = "yellow";
+        this.ctx.lineWidth=1;
+        this.ctx.strokeRect(y+this.y, x+this.x,this.width, this.height);
+    }
+}
+
+class Map
+{
+    constructor(textureName,obstacles,checkpoints)
+    {
+        this.image=document.getElementById(textureName);
+        this.obstacles=obstacles;
+        this.checkpoints=checkpoints;
+
+    }
+
+    draw(x,y)
+    {
+        myGameArea.context.drawImage(this.image,y,x);
+    }
+}
+
+class Player extends Component
+{
+    constructor(width, height, x, y,textureName) 
+    {
+        super(width, height, x, y) ;
+        this.texture=document.getElementById(textureName);
+        this.realX=0;
+        this.realY=0;
+        this.map=0;
+        this.speed=2;
+    }
+
+    changeMap(map)
+    {
+        this.map=map;
+    }
+
+    draw()
+    {
+        myGameArea.context.drawImage(this.texture,this.y,this.x);
+        //console.log(this.realX,this.realY);
+    }
+
+    update()
+    {
+        //if(this.getColidedPart()!=0)
+            //console.log(this.getColidedPart())
+        if (myGameArea.keys && myGameArea.keys[87]) 
+            {
+                for(let i=0;i<this.speed;i++)
+                {
+                    if(this.getColidedPart()[0]!=1) 
+                        this.realX--;
+                    else
+                        break;
+                    if(this.getCheckpointColision()!=0)
+                        i=this.speed;
+                }
+                
+            }
+        if (myGameArea.keys && myGameArea.keys[83])
+        {
+            for(let i=0;i<this.speed;i++)
+            {
+                if(this.getColidedPart()[2]!=1)
+                    this.realX++;
+                else
+                    break;
+                if(this.getCheckpointColision()!=0)
+                    i=this.speed;
+            }
+        }
+        if (myGameArea.keys && myGameArea.keys[65]) 
+        {
+            for(let i=0;i<this.speed;i++)
+            {
+                if(this.getColidedPart()[3]!=1)
+                    this.realY--;
+                else
+                    break;
+                if(this.getCheckpointColision()!=0)
+                    i=this.speed;
+            }
+        }
+        if (myGameArea.keys && myGameArea.keys[68])
+        {
+            for(let i=0;i<this.speed;i++)
+            {
+                if(this.getColidedPart()[1]!=1)
+                    this.realY++;
+                else
+                    break;
+                if(this.getCheckpointColision()!=0)
+                    i=this.speed;
+            }
+        }
+    }
+
+    getColidedPart()
+    { 
+        let colisions=[0,0,0,0];
+        for(let i=0;i<this.map.obstacles.length;i++)
+        {
+            let obstacle=this.map.obstacles[i];
+            for(let j=0;j<this.width;j++)
+            {
+                if((this.realX)==(obstacle.x+obstacle.height))
+                    if(((this.realY+j)>=obstacle.y)&&((this.realY+j)<=obstacle.y+obstacle.width-1))
+                    {
+                        colisions[0]=1;
+                        j=this.width;
+                    }
+                if((this.realX+this.height)==(obstacle.x))
+                    if(((this.realY+j)>=obstacle.y)&&((this.realY+j)<=(obstacle.y+obstacle.width-1)))
+                    {
+                        colisions[2]=1;
+                        j=this.width;
+                    }
+            }
+            for(let j=0;j<this.height;j++)
+            {
+                if((this.realY)==(obstacle.y+obstacle.width))
+                    if(((this.realX+j)>=obstacle.x)&&((this.realX+j)<=(obstacle.x+obstacle.height-1)))
+                    {
+                        colisions[3]=1;
+                        j=this.height;
+                    }
+                if((this.realY+this.width)==(obstacle.y))
+                    if(((this.realX+j)>=obstacle.x)&&((this.realX+j)<=(obstacle.x+obstacle.height-1)))
+                    {
+                        colisions[1]=1;
+                        j=this.height;
+                    }
+            }
+        }
+        return colisions;
+    }
+
+    getCheckpointColision()
+    {
+        for(let i=0;i<this.map.checkpoints.length;i++)
+        {
+            let checkpoint=this.map.checkpoints[i];
+            for(let j=0;j<this.width;j++)
+            {
+                if((this.realX)==(checkpoint.x+checkpoint.height))
+                    if(((this.realY+j)>=checkpoint.y)&&((this.realY+j)<=checkpoint.y+checkpoint.width-2))
+                    {
+                        return checkpoint.id;
+                    }
+                if((this.realX+this.height)==(checkpoint.x))
+                    if(((this.realY+j)>=checkpoint.y)&&((this.realY+j)<=(checkpoint.y+checkpoint.width-2)))
+                    {
+                        return checkpoint.id;
+                    }
+            }
+            for(let j=0;j<this.height;j++)
+            {
+                if((this.realY)==(checkpoint.y+checkpoint.width))
+                    if(((this.realX+j)>=checkpoint.x)&&((this.realX+j)<=(checkpoint.x+checkpoint.height-2)))
+                    {
+                        return checkpoint.id;
+                    }
+                if((this.realY+this.width)==(checkpoint.y))
+                    if(((this.realX+j)>=checkpoint.x)&&((this.realX+j)<=(checkpoint.x+checkpoint.height-2)))
+                    {
+                        return checkpoint.id;
+                    }
+            }
+        }
+        return 0;
+    }
+
+}
+
 class gameLogic
 {
     constructor()
@@ -137,8 +325,22 @@ class gameLogic
         }
         if(this.state==3)//play ground floor map
         {
-            this.displayMap();
+            let checkpoint=0;
+            checkpoint=this.displayGroundLevelMap();
+            if(checkpoint=="c210")
+                this.state++;
 
+            return 0;
+        }
+        if(this.state==4)//load c210 map
+        {
+            this.loadC210Map();
+            this.state++;
+            return 0;
+        }
+        if(this.state==5)//play c210 map
+        {
+            this.displayC210Map();
             return 0;
         }
         
@@ -188,131 +390,80 @@ class gameLogic
         obstacles[9]=new Component(611-540,12,378,540);
         obstacles[10]=new Component(683-612,24,372,612);
         obstacles[11]=new Component(1547-996,24,372,996);
+        obstacles[12]=new Component(1619-1548,9,379,1548);
+        obstacles[13]=new Component(1691-1620,24,372,1620);
 
-        this.groundFloorMap=new Map("map",obstacles);
-        this.player=new Player(50,50,275,375,"player",this.groundFloorMap)
+
+        let checkpoints=[];
+        checkpoints[0]=new Checkpoint(1619-1548,9,380,1548,"c210");
+
+        this.groundFloorMap=new Map("map",obstacles,checkpoints);
+        this.player=new Player(50,50,275,375,"player");
+
+        this.player.changeMap(this.groundFloorMap)
+
+        this.player.realX=1270;
+        this.player.realY=700;
+
+        //var myJson=JSON.stringify(obstacles);
+        //console.log(myJson);
+        
+        //this.mainEntranceX=1270;
+        //this.mainEntranceY=700;
+
+        //this.c210X=420;
+        //this.c210Y=1560;
+        
     }
-    displayMap()
+    displayGroundLevelMap()
     {
         this.groundFloorMap.draw(0-(this.player.realX)+this.player.x,0-(this.player.realY)+this.player.y);
+        this.groundFloorMap.checkpoints[0].draw(0-(this.player.realX)+this.player.x,0-(this.player.realY)+this.player.y);
+
+
+        this.player.update();
+        this.player.draw();
+
+        if(this.player.getCheckpointColision()!=0)
+            if(this.player.getCheckpointColision()=="c210")
+                return "c210";
+    }
+
+    loadC210Map()
+    {
+        let obstacles=[];
+        let checkpoints=[];
+        this.c210Map=new Map("c210",obstacles,checkpoints);
+        this.player.changeMap(this.c210Map);
+        this.player.realX=500;
+        this.player.realY=600;
+        this.player.map=this.c210Map;
+    }
+
+    displayC210Map()
+    {
+        this.c210Map.draw(0-(this.player.realX)+this.player.x,0-(this.player.realY)+this.player.y);
+
+
         this.player.update();
         this.player.draw();
     }
 }
 
 
-class Map
-{
-    constructor(textureName,obstacles)
-    {
-        this.image=document.getElementById(textureName);
-        this.obstacles=obstacles;
-    }
 
-    draw(x,y)
-    {
-        myGameArea.context.drawImage(this.image,y,x);
-    }
-}
 
-class Player extends Component
-{
-    constructor(width, height, x, y,textureName,map) 
-    {
-        super(width, height, x, y) ;
-        this.texture=document.getElementById(textureName);
-        this.realX=800;
-        this.realY=800;
-        this.map=map;
-        this.speed=10;
-    }
 
-    draw()
-    {
-        myGameArea.context.drawImage(this.texture,this.y,this.x);
-        //console.log(this.realX,this.realY);
-    }
 
-    update()
-    {
-        //if(this.getColidedPart()!=0)
-            //console.log(this.getColidedPart())
-        if (myGameArea.keys && myGameArea.keys[87]) 
-            {
-                for(let i=0;i<this.speed;i++)
-                    if(this.getColidedPart()[0]!=1) 
-                        this.realX--;
-                    else
-                        break;
-                
-            }
-        if (myGameArea.keys && myGameArea.keys[83])
-        {
-            for(let i=0;i<this.speed;i++) 
-                if(this.getColidedPart()[2]!=1)
-                    this.realX++;
-                else
-                    break; 
-        }
-        if (myGameArea.keys && myGameArea.keys[65]) 
-        {
-            for(let i=0;i<this.speed;i++)
-                if(this.getColidedPart()[3]!=1)
-                    this.realY--;
-                else
-                    break;
-        }
-        if (myGameArea.keys && myGameArea.keys[68])
-        {
-            for(let i=0;i<this.speed;i++)
-                if(this.getColidedPart()[1]!=1)
-                    this.realY++;
-            else
-            break;
-        }
-    }
 
-    getColidedPart()
-    { 
-        let colisions=[0,0,0,0];
-        for(let i=0;i<this.map.obstacles.length;i++)
-        {
-            let obstacle=this.map.obstacles[i];
-            for(let j=0;j<this.width;j++)
-            {
-                if((this.realX+1)==(obstacle.x+obstacle.height))
-                    if(((this.realY+j)>=obstacle.y)&&((this.realY+j)<=obstacle.y+obstacle.width))
-                    {
-                        colisions[0]=1;
-                        j=this.width;
-                    }
-                if((this.realX+this.height)==(obstacle.x))
-                if(((this.realY+j)>=obstacle.y)&&((this.realY+j)<=(obstacle.y+obstacle.width)))
-                    {
-                        colisions[2]=1;
-                        j=this.width;
-                    }
-            }
-            for(let j=0;j<this.height;j++)
-            {
-                if((this.realY)==(obstacle.y+obstacle.width))
-                    if(((this.realX+j)>=obstacle.x)&&((this.realX+j)<=(obstacle.x+obstacle.height)))
-                    {
-                        colisions[3]=1;
-                        j=this.height;
-                    }
-                if((this.realY+this.width)==(obstacle.y))
-                    if(((this.realX+j)>=obstacle.x)&&((this.realX+j)<=(obstacle.x+obstacle.height)))
-                    {
-                        colisions[1]=1;
-                        j=this.height;
-                    }
-            }
-        }
-        return colisions;
-    }
 
-}
+
+
+
+
+
+
+
 
 //var myGamePiece;
 var myGameArea=new Game();
