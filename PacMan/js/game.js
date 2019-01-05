@@ -123,18 +123,36 @@ class Checkpoint extends Component
 
 class Map
 {
-    constructor(textureName,obstacles,checkpoints)
+    constructor(textureName,obstacles,checkpoints,mapElements)
     {
         this.image=document.getElementById(textureName);
         this.obstacles=obstacles;
         this.checkpoints=checkpoints;
+        this.mapElements=mapElements;
 
     }
 
     draw(x,y)
     {
         myGameArea.context.drawImage(this.image,y,x);
+        for(let i=0;i<this.mapElements.length;i++)
+            this.mapElements[i].draw(x,y);
     }
+}
+
+class MapElement extends Component
+{
+    constructor(width, height, x, y,textureName)
+    {
+        super(width,height,x,y);
+        this.image=document.getElementById(textureName);
+    }
+
+    draw(x,y)
+    {
+        myGameArea.context.drawImage(this.image,y+this.y,x+this.x);
+    }
+
 }
 
 class Player extends Component
@@ -292,6 +310,15 @@ class Player extends Component
 
 }
 
+/*class Mob extends Component
+{
+    constructor(width, height, x, y,textureName,map)
+    {
+        super(width, height, x, y);
+        
+    }
+}*/
+
 class gameLogic
 {
     constructor()
@@ -397,7 +424,7 @@ class gameLogic
         let checkpoints=[];
         checkpoints[0]=new Checkpoint(1619-1548,9,380,1548,"c210");
 
-        this.groundFloorMap=new Map("map",obstacles,checkpoints);
+        this.groundFloorMap=new Map("map",obstacles,checkpoints,[]);
         this.player=new Player(50,50,275,375,"player");
 
         this.player.changeMap(this.groundFloorMap)
@@ -433,7 +460,65 @@ class gameLogic
     {
         let obstacles=[];
         let checkpoints=[];
-        this.c210Map=new Map("c210",obstacles,checkpoints);
+        let mapElements=[];
+
+        let offsetX=144;
+        let offsetY=144;
+
+        /*let gaps=
+        [
+        [1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,0,0,0,0,0,0,0],
+        [1,1,1,1,1,1,1,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0],
+        [1,1,1,1,1,1,1,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0]
+        ];*/
+
+        let gaps=
+        [
+        [1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+        [1,0,0,1,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,1,1,1,0,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,0,1],
+        [1,0,0,0,1,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,1,0,1,0,1,0,0,1,0,1,0,1,1,1,1,1,1,1,1,1,1],
+        [1,0,1,1,1,0,1,0,0,1,0,1,1,1,0,1,0,0,0,0,0,0,0],
+        [1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0],
+        [1,1,1,1,1,1,1,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0,0]
+        ];
+
+        for(let i=0;i<8;i++)
+        {
+            for(let j=0;j<23;j++)
+            {
+                if(Math.floor(Math.random()*4)==3)
+                {
+                    if((i>0)&&(i<7))
+                        if((j>0)&&(j<23))
+                        {
+                            if(((gaps[i][j-1]!=0)||(gaps[i-1][j-1]!=0)||(gaps[i-1][j]!=0))&&((gaps[i-1][j+1]!=0)||(gaps[i][j+1]!=0)||(gaps[i-1][j]!=0))&&((gaps[i][j+1]!=0)||(gaps[i+1][j+1]!=0)||(gaps[i+1][j]!=0))&&((gaps[i+1][j]!=0)||(gaps[i+1][j-1]!=0)||(gaps[i][j-1]!=0)))
+                                gaps[i][j]=0;
+                        }
+                }
+            }
+            console.log(gaps[i]);
+        }
+
+        for(let i=0;i<8;i++)
+        {
+            for(let j=0;j<23;j++)
+            {
+                if(gaps[i][j]==1)
+                {
+                    mapElements.push(new MapElement(48,48,offsetX+48*i,offsetY+48*j,"obstacle"));
+                    obstacles.push(new Component(46,46,offsetX+48*i,offsetY+48*j));
+                }
+            }
+        }
+
+        this.c210Map=new Map("c210",obstacles,checkpoints,mapElements);
         this.player.changeMap(this.c210Map);
         this.player.realX=500;
         this.player.realY=600;
