@@ -310,6 +310,52 @@ class Player extends Component
 
 }
 
+class DirectionSwitch
+{
+    constructor(x,y,directions)
+    {
+        this.x=x;
+        this.y=y;
+        this.d=directions;
+    }
+
+    changeDirection(dir)
+    {
+        if(this.d.length>2)
+        {
+            let randomDir=this.d[Math.floor(Math.random()*this.d.length)];
+            while(randomDir==this.getOpposingDirection(dir))
+                randomDir=this.d[Math.floor(Math.random()*this.d.length)];
+            return randomDir;
+
+        }
+        if(this.d.length==2)
+        {
+            if(this.d[0]==this.getOpposingDirection(dir))
+                return this.d[1];
+            else
+                return this.d[0];
+        }
+        
+        return this.d[0];
+        
+
+
+    }
+
+    getOpposingDirection(dir)
+    {
+        if(dir==0)
+            return 1;
+        if(dir==1)
+            return 0;
+        if(dir==2)
+            return 3;
+        else
+            return 2;
+    }
+}
+
 /*class Mob extends Component
 {
     constructor(width, height, x, y,textureName,map)
@@ -318,6 +364,8 @@ class Player extends Component
         
     }
 }*/
+
+
 
 class gameLogic
 {
@@ -462,8 +510,8 @@ class gameLogic
         let checkpoints=[];
         let mapElements=[];
 
-        let offsetX=144;
-        let offsetY=144;
+        let offsetX=144-48;
+        let offsetY=144-48;
 
         /*let gaps=
         [
@@ -479,36 +527,90 @@ class gameLogic
 
         let gaps=
         [
-        [1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-        [1,0,0,1,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1],
-        [1,0,1,1,1,0,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,0,1],
-        [1,0,0,0,1,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1],
-        [1,0,1,0,1,0,1,0,0,1,0,1,0,1,1,1,1,1,1,1,1,1,1],
-        [1,0,1,1,1,0,1,0,0,1,0,1,1,1,0,1,0,0,0,0,0,0,0],
-        [1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0],
-        [1,1,1,1,1,1,1,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0,0]
+        [9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9],
+        [9,1,1,1,1,1,1,1,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,9],
+        [9,1,0,0,1,0,0,1,2,2,1,0,0,0,0,0,0,0,0,0,0,0,0,1,9],
+        [9,1,0,1,1,1,0,1,2,2,1,1,1,1,1,1,1,1,1,1,1,1,0,1,9],
+        [9,1,0,0,0,1,0,1,2,2,1,0,0,0,0,0,0,0,0,0,0,0,0,1,9],
+        [9,1,0,1,0,1,0,1,2,2,1,0,1,0,1,1,1,1,1,1,1,1,1,1,9],
+        [9,1,0,1,1,1,0,1,2,2,1,0,1,1,1,0,1,0,0,0,0,0,0,0,9],
+        [9,1,0,0,0,0,0,0,2,2,1,0,0,0,0,0,1,0,0,0,0,0,0,0,9],
+        [9,1,1,1,1,1,1,1,2,2,0,0,1,1,1,1,1,0,0,0,0,0,0,0,9],
+        [9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9]
         ];
 
-        for(let i=0;i<8;i++)
+        for(let i=1;i<9;i++)
         {
-            for(let j=0;j<23;j++)
+            for(let j=1;j<24;j++)
             {
-                if(Math.floor(Math.random()*4)==3)
-                {
-                    if((i>0)&&(i<7))
-                        if((j>0)&&(j<23))
-                        {
-                            if(((gaps[i][j-1]!=0)||(gaps[i-1][j-1]!=0)||(gaps[i-1][j]!=0))&&((gaps[i-1][j+1]!=0)||(gaps[i][j+1]!=0)||(gaps[i-1][j]!=0))&&((gaps[i][j+1]!=0)||(gaps[i+1][j+1]!=0)||(gaps[i+1][j]!=0))&&((gaps[i+1][j]!=0)||(gaps[i+1][j-1]!=0)||(gaps[i][j-1]!=0)))
-                                gaps[i][j]=0;
-                        }
-                }
+                if(gaps[i][j]==1)
+                    if(Math.floor(Math.random()*3)==2)
+                    {
+                        //if((i>0)&&(i<7))
+                            //if((j>0)&&(j<23))
+                            {
+                                if(((gaps[i][j-1]!=0)||(gaps[i-1][j-1]!=0)||(gaps[i-1][j]!=0))&&((gaps[i-1][j+1]!=0)||(gaps[i][j+1]!=0)||(gaps[i-1][j]!=0))&&((gaps[i][j+1]!=0)||(gaps[i+1][j+1]!=0)||(gaps[i+1][j]!=0))&&((gaps[i+1][j]!=0)||(gaps[i+1][j-1]!=0)||(gaps[i][j-1]!=0)))
+                                    gaps[i][j]=0;
+                            }
+                    }
             }
-            console.log(gaps[i]);
+            //console.log(gaps[i]);
         }
 
-        for(let i=0;i<8;i++)
+        let gapsCount=0;
+        let gapsDirections=[];
+        let directions=[];
+        for(let i=1;i<8;i++)
         {
-            for(let j=0;j<23;j++)
+            for(let j=1;j<23;j++)
+            {
+                gapsDirections=[];
+                gapsCount=0;
+                if(gaps[i][j]==0)
+                {
+                    gapsCount=(gaps[i-1][j]==0?1:0)+(gaps[i+1][j]==0?1:0)+(gaps[i][j-1]==0?1:0)+(gaps[i][j+1]==0?1:0);
+                    if(gapsCount>0)
+                        if(gapsCount!=2)
+                        {
+                            if(gaps[i-1][j]==0)
+                                gapsDirections.push(0);
+                            if(gaps[i+1][j]==0)
+                                gapsDirections.push(1);
+                            if(gaps[i][j-1]==0)
+                                gapsDirections.push(2);
+                            if(gaps[i][j+1]==0)
+                                gapsDirections.push(3);
+                            directions.push(new DirectionSwitch(offsetX+48*i,offsetY+48*j,gapsDirections));
+                            
+                        }
+                        else
+                        {
+                            if(((gaps[i-1][j]==0)||(gaps[i+1][j]==0))&&((gaps[i][j-1]==0)||(gaps[i][j+1]==0)))
+                            {
+                                if(gaps[i-1][j]==0)
+                                    gapsDirections.push(0);
+                                if(gaps[i+1][j]==0)
+                                    gapsDirections.push(1);
+                                if(gaps[i][j-1]==0)
+                                    gapsDirections.push(2);
+                                if(gaps[i][j+1]==0)
+                                    gapsDirections.push(3);
+                                directions.push(new DirectionSwitch(offsetX+48*i,offsetY+48*j,gapsDirections));
+                            }
+                        }
+                    //console.log(i,j,":",gapsCount);
+                    //if((gaps[i-1],j==0)&&(gaps[i][j-1]==0)&&(gaps[i],[j+1]==0))||((gaps[i+1],j==0)&&(gaps[i][j-1]==0)&&(gaps[i],[j+1]==0))
+                }
+            }
+        }
+
+        for(let i=0;i<directions.length;i++)
+            console.log(directions[i].x,directions[i].y,directions[i].d);
+
+
+        for(let i=0;i<9;i++)
+        {
+            for(let j=0;j<24;j++)
             {
                 if(gaps[i][j]==1)
                 {
@@ -555,7 +657,6 @@ var myGameArea=new Game();
 var logic=new gameLogic();
 
 function startGame() {
-
     //myGamePiece = new component(30, 30, "red", 10, 120);
     myGameArea.start();
     //myObstacle = new component(10, 200, "green", 300, 120);
