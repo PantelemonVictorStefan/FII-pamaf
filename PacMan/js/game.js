@@ -123,12 +123,13 @@ class Checkpoint extends Component
 
 class Map
 {
-    constructor(textureName,obstacles,checkpoints,mapElements)
+    constructor(textureName,obstacles,checkpoints,mapElements,directions)
     {
         this.image=document.getElementById(textureName);
         this.obstacles=obstacles;
         this.checkpoints=checkpoints;
         this.mapElements=mapElements;
+        this.directions=directions;
 
     }
 
@@ -356,14 +357,148 @@ class DirectionSwitch
     }
 }
 
-/*class Mob extends Component
+class Mob extends Component
 {
     constructor(width, height, x, y,textureName,map)
     {
         super(width, height, x, y);
-        
+        this.texture=document.getElementById(textureName);
+        this.realX=x;
+        this.realY=y;
+        this.map=map;
+        this.speed=1;
+
+        let colisions=this.getColidedPart();
+        if(colisions[0]==0)
+            this.direction=0;
+        else
+            if(colisions[1]==0)
+                this.direction=2;
+            else
+                if(colisions[2]==0)
+                    this.direction=3;
+                else
+                    if(colisions[3]==0)
+                        this.direction=1;
     }
-}*/
+
+
+    getColidedPart()
+    { 
+        let colisions=[0,0,0,0];
+        for(let i=0;i<this.map.obstacles.length;i++)
+        {
+            let obstacle=this.map.obstacles[i];
+            for(let j=0;j<this.width;j++)
+            {
+                if((this.x)==(obstacle.x+obstacle.height))
+                    if(((this.y+j)>=obstacle.y)&&((this.y+j)<=obstacle.y+obstacle.width-1))
+                    {
+                        colisions[0]=1;
+                        j=this.width;
+                    }
+                if((this.x+this.height)==(obstacle.x))
+                    if(((this.y+j)>=obstacle.y)&&((this.y+j)<=(obstacle.y+obstacle.width-1)))
+                    {
+                        colisions[2]=1;
+                        j=this.width;
+                    }
+            }
+            for(let j=0;j<this.height;j++)
+            {
+                if((this.y)==(obstacle.y+obstacle.width))
+                    if(((this.x+j)>=obstacle.x)&&((this.x+j)<=(obstacle.x+obstacle.height-1)))
+                    {
+                        colisions[3]=1;
+                        j=this.height;
+                    }
+                if((this.y+this.width)==(obstacle.y))
+                    if(((this.x+j)>=obstacle.x)&&((this.x+j)<=(obstacle.x+obstacle.height-1)))
+                    {
+                        colisions[1]=1;
+                        j=this.height;
+                    }
+            }
+        }
+        return colisions;
+    }
+
+
+    checkForDirection()
+    {
+        let direction;
+        for(let i=0;i<this.map.directions.length;i++)
+        {
+            direction=this.map.directions[i];
+             if((this.x==direction.x-2)&&(this.y==direction.y-2))
+            {
+                //console.log("direction at:",direction.x,direction.y);
+                //console.log("old direction:",this.direction);
+                this.direction=direction.changeDirection(this.direction);
+                //console.log("new direction",this.direction);
+            }
+                 //console.log("DIRECTION",direction.x,direction.y);
+
+        }
+    }
+    update()
+    {
+        this.checkForDirection();
+        
+        if (this.direction==0) 
+            {
+                for(let i=0;i<this.speed;i++)
+                {
+                    if(this.getColidedPart()[0]!=1) 
+                        this.x--;
+                    else
+                        break;
+                    
+                }
+                
+            }
+        if (this.direction==1)
+        {
+            for(let i=0;i<this.speed;i++)
+            {
+                if(this.getColidedPart()[2]!=1)
+                    this.x++;
+                else
+                    break;
+                
+            }
+        }
+        if (this.direction==2)
+        {
+            for(let i=0;i<this.speed;i++)
+            {
+                if(this.getColidedPart()[3]!=1)
+                    this.y--;
+                else
+                    break;
+                
+            }
+        }
+        if (this.direction==3)
+        {
+            for(let i=0;i<this.speed;i++)
+            {
+                if(this.getColidedPart()[1]!=1)
+                    this.y++;
+                else
+                    break;
+                
+            }
+        }
+    }
+
+    draw(x,y)
+    {
+        myGameArea.context.drawImage(this.texture,y+this.y,x+this.x);
+        //myGameArea.context.drawImage(this.texture,0,0);
+    }
+
+}
 
 
 
@@ -472,7 +607,7 @@ class gameLogic
         let checkpoints=[];
         checkpoints[0]=new Checkpoint(1619-1548,9,380,1548,"c210");
 
-        this.groundFloorMap=new Map("map",obstacles,checkpoints,[]);
+        this.groundFloorMap=new Map("map",obstacles,checkpoints,[],[]);
         this.player=new Player(50,50,275,375,"player");
 
         this.player.changeMap(this.groundFloorMap)
@@ -534,7 +669,7 @@ class gameLogic
         [9,1,0,0,0,1,0,1,2,2,1,0,0,0,0,0,0,0,0,0,0,0,0,1,9],
         [9,1,0,1,0,1,0,1,2,2,1,0,1,0,1,1,1,1,1,1,1,1,1,1,9],
         [9,1,0,1,1,1,0,1,2,2,1,0,1,1,1,0,1,0,0,0,0,0,0,0,9],
-        [9,1,0,0,0,0,0,0,2,2,1,0,0,0,0,0,1,0,0,0,0,0,0,0,9],
+        [9,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,9],
         [9,1,1,1,1,1,1,1,2,2,0,0,1,1,1,1,1,0,0,0,0,0,0,0,9],
         [9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9]
         ];
@@ -620,20 +755,30 @@ class gameLogic
             }
         }
 
-        this.c210Map=new Map("c210",obstacles,checkpoints,mapElements);
+        this.c210Map=new Map("c210",obstacles,checkpoints,mapElements,directions);
         this.player.changeMap(this.c210Map);
         this.player.realX=500;
         this.player.realY=600;
         this.player.map=this.c210Map;
+
+        this.mob=new Mob(50,50,334,286,"mobFace",this.c210Map);
+        
+        //constructor(width, height, x, y,textureName,map);
     }
 
     displayC210Map()
     {
-        this.c210Map.draw(0-(this.player.realX)+this.player.x,0-(this.player.realY)+this.player.y);
-
-
         this.player.update();
+        this.mob.update();
+        this.c210Map.draw(0-(this.player.realX)+this.player.x,0-(this.player.realY)+this.player.y);
+        this.mob.draw(0-(this.player.realX)+this.player.x,0-(this.player.realY)+this.player.y);
+
+        
+
+        
         this.player.draw();
+        
+        
     }
 }
 
