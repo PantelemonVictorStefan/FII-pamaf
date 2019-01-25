@@ -123,6 +123,7 @@ class Checkpoint extends Component
 
 class Map
 {
+    
     constructor(textureName,obstacles,checkpoints,mapElements,directions)
     {
         this.image=document.getElementById(textureName);
@@ -139,6 +140,129 @@ class Map
         for(let i=0;i<this.mapElements.length;i++)
             this.mapElements[i].draw(x,y);
     }
+}
+
+class MapFromJson extends Map
+{
+    constructor(jsonFile)
+    {
+        let mapData=JSON.parse(jsonFile);
+        let obstacles=[];
+        let checkpoints=[];
+        for(let i=0;i<mapData[1].length;i++)
+        {
+            //console.log(mapData[1][i]);
+            obstacles.push(new Component(mapData[1][i].width,mapData[1][i].height,mapData[1][i].x,mapData[1][i].y));
+        }
+
+        for(let i=0;i<mapData[2].length;i++)
+        {
+            //console.log(mapData[2][i]);
+            checkpoints.push(new Checkpoint(mapData[2][i].width,mapData[2][i].height,mapData[2][i].x,mapData[2][i].y,mapData[2][i].id));
+        }
+
+        super(mapData[0],obstacles,checkpoints,[],[]);
+        this.pierceMap(mapData[3]);
+        this.addDirections(this.roomMatrix,mapData[4],mapData[5],mapData[6]);
+        //this.addDir(mapData[4],this.roomMatrix,mapData[5],mapData[6]);
+        this.addGeneratedObstacles(mapData[5],mapData[6]);
+        
+
+
+        //console.log(mapData[3]);
+
+        //let c210Data=["c210",obstacles,checkpoints,gaps,impenetrable,offsetX,offsetY];
+
+        
+
+    }
+
+    pierceMap(roomMatrix)
+    {
+        for(let i=1;i<roomMatrix.length-1;i++)
+        {
+            for(let j=1;j<roomMatrix[i].length;j++)
+            {
+                if(roomMatrix[i][j]==1)
+                    if(Math.floor(Math.random()*2)==1)
+                    {
+                            {
+                                if(((roomMatrix[i][j-1]!=0)||(roomMatrix[i-1][j-1]!=0)||(roomMatrix[i-1][j]!=0))&&((roomMatrix[i-1][j+1]!=0)||(roomMatrix[i][j+1]!=0)||(roomMatrix[i-1][j]!=0))&&((roomMatrix[i][j+1]!=0)||(roomMatrix[i+1][j+1]!=0)||(roomMatrix[i+1][j]!=0))&&((roomMatrix[i+1][j]!=0)||(roomMatrix[i+1][j-1]!=0)||(roomMatrix[i][j-1]!=0)))
+                                    roomMatrix[i][j]=0;
+                            }
+                    }
+            }
+        }
+
+        this.roomMatrix=roomMatrix;
+    }
+
+    addDirections(roomMatrix,impenetrable,offsetX,offsetY)
+    {
+        let gapsCount=0;
+        let gapsDirections=[];
+        let directions=[];
+        let roomMatrixDirections=[];
+        for(let i=1;i<roomMatrix.length-1;i++)
+        {
+            for(let j=1;j<roomMatrix[i].length;j++)
+            {
+                gapsDirections=[];
+                gapsCount=0;
+                if(!impenetrable.includes(roomMatrix[i][j]))
+                {
+                    gapsCount=(!impenetrable.includes(roomMatrix[i-1][j])?1:0)+(!impenetrable.includes(roomMatrix[i+1][j])?1:0)+(!impenetrable.includes(roomMatrix[i][j-1])?1:0)+(!impenetrable.includes(roomMatrix[i][j+1])?1:0);
+                    if(gapsCount>0)
+                        if(gapsCount!=2)
+                        {
+                            if(!impenetrable.includes(roomMatrix[i-1][j]))
+                                gapsDirections.push(0);
+                            if(!impenetrable.includes(roomMatrix[i+1][j]))
+                                gapsDirections.push(1);
+                            if(!impenetrable.includes(roomMatrix[i][j-1]))
+                                gapsDirections.push(2);
+                            if(!impenetrable.includes(roomMatrix[i][j+1]))
+                                gapsDirections.push(3);
+                            directions.push(new DirectionSwitch(offsetX+48*i,offsetY+48*j,gapsDirections));
+                            
+                        }
+                        else
+                        {
+                            if(((!impenetrable.includes(roomMatrix[i-1][j]))||(!impenetrable.includes(roomMatrix[i+1][j])))&&((!impenetrable.includes(roomMatrix[i][j-1]))||(!impenetrable.includes(roomMatrix[i][j+1]))))
+                            {
+                                if(!impenetrable.includes(roomMatrix[i-1][j]))
+                                    gapsDirections.push(0);
+                                if(!impenetrable.includes(roomMatrix[i+1][j]))
+                                    gapsDirections.push(1);
+                                if(!impenetrable.includes(roomMatrix[i][j-1]))
+                                    gapsDirections.push(2);
+                                if(!impenetrable.includes(roomMatrix[i][j+1]))
+                                    gapsDirections.push(3);
+                                directions.push(new DirectionSwitch(offsetX+48*i,offsetY+48*j,gapsDirections));
+                            }
+                        }
+                }
+            }
+        }
+       this.directions=directions;
+    }
+
+
+    addGeneratedObstacles(offsetX,offsetY)
+    {
+        for(let i=1;i<this.roomMatrix.length-1;i++)
+        {
+            for(let j=1;j<this.roomMatrix[i].length;j++)
+            {
+                if(this.roomMatrix[i][j]==1)
+                {
+                    this.mapElements.push(new MapElement(48,48,offsetX+48*i,offsetY+48*j,"obstacle"));
+                    this.obstacles.push(new Component(46,46,offsetX+48*i,offsetY+48*j));
+                }
+            }
+        }
+    }
+
 }
 
 class MapElement extends Component
@@ -166,11 +290,81 @@ class Player extends Component
         this.realY=0;
         this.map=0;
         this.speed=2;
+        this.mobs=[];
+        this.collectibles=[];
+    }
+
+    addMobs(mobs)
+    {
+        this.mobs=mobs;
     }
 
     changeMap(map)
     {
         this.map=map;
+    }
+
+    hasColidedWithMob()
+    {
+        for(let i=0;i<this.mobs.length;i++)
+        {
+            if(this.hasColidedWithObject(this.mobs[i]))
+                return i;
+        }
+        return -1;
+    }
+
+    defineCollectibles(collectibles)
+    {
+        this.collectibles=collectibles;
+    }
+
+    hasColidedWithCollectible()
+    {
+        for(let i=0;i<this.collectibles.length;i++)
+        {
+            if(this.hasColidedWithObject(this.collectibles[i]))
+                return this.collectibles[i].id;
+        }
+        return -1;
+    }
+
+    hasColidedWithObject(object)
+    {
+        return this.isInTheObject(object)||object.isInTheObject(this);
+    }
+
+    isInTheObject(object)
+    {
+        let x1=this.realX;
+        let y1=this.realY;
+        let x2=this.realX+this.height-1;
+        let y2=this.realY+this.width-1;
+
+
+        
+        let cx1=object.x;
+        let cy1=object.y;
+        let cx2=object.x+object.height-1;
+        let cy2=object.y+object.width-1;
+
+        if((x1>=cx1)&&(x1<=cx2))
+        {
+            if((y1>=cy1)&&(y1<=cy2))
+                return true;
+            if((y2>=cy1)&&(y2<=cy2))
+                return true;
+        }
+        if((x2>=cx1)&&(x2<=cx2))
+        {
+            if((y1>=cy1)&&(y1<=cy2))
+                return true;
+            if((y2>=cy1)&&(y2<=cy2))
+                return true;
+        }
+        
+
+        return false;
     }
 
     draw()
@@ -498,6 +692,94 @@ class Mob extends Component
         //myGameArea.context.drawImage(this.texture,0,0);
     }
 
+    isInTheObject(object)
+    {
+        let x1=this.x;
+        let y1=this.y;
+        let x2=this.x+this.height-1;
+        let y2=this.y+this.width-1;
+
+
+        
+        let cx1=object.realX;
+        let cy1=object.realY;
+        let cx2=object.realX+object.height-1;
+        let cy2=object.realY+object.width-1;
+        
+        if((x1>=cx1)&&(x1<=cx2))
+        {
+            if((y1>=cy1)&&(y1<=cy2))
+                return true;
+            if((y2>=cy1)&&(y2<=cy2))
+                return true;
+        }
+        if((x2>=cx1)&&(x2<=cx2))
+        {
+            if((y1>=cy1)&&(y1<=cy2))
+                return true;
+            if((y2>=cy1)&&(y2<=cy2))
+                return true;
+        }
+        
+
+        return false;
+    }
+
+}
+
+
+class Collectible extends Component
+{
+    constructor(width,height,x,y,textureName,id)
+    {
+        super(width,height,x,y);
+        this.texture=document.getElementById(textureName);
+        this.id=id;
+    }
+
+    draw(x,y)
+    {
+        myGameArea.context.drawImage(this.texture,y+this.y,x+this.x);
+    }
+
+    hasColidedWithObject(object)
+    {
+        return this.isInTheObject(object)||object.isInTheObject(this);
+    }
+
+    isInTheObject(object)
+    {
+        let x1=this.x;
+        let y1=this.y;
+        let x2=this.x+this.height-1;
+        let y2=this.y+this.width-1;
+
+
+        
+        let cx1=object.realX;
+        let cy1=object.realY;
+        let cx2=object.realX+object.height-1;
+        let cy2=object.realY+object.width-1;
+        
+        if((x1>=cx1)&&(x1<=cx2))
+        {
+            if((y1>=cy1)&&(y1<=cy2))
+                return true;
+            if((y2>=cy1)&&(y2<=cy2))
+                return true;
+        }
+        if((x2>=cx1)&&(x2<=cx2))
+        {
+            if((y1>=cy1)&&(y1<=cy2))
+                return true;
+            if((y2>=cy1)&&(y2<=cy2))
+                return true;
+        }
+        
+
+        return false;
+    }
+
 }
 
 
@@ -560,60 +842,124 @@ class gameLogic
     loadPlayerDetails()
     {
         console.log("loaded character details");
-        this.image=document.getElementById("myImg");
+        this.image=document.getElementById("legitimatie");
         this.avatar=document.getElementById("avatarImg");
-        this.myButton=new Button(30, 30, 400, 400,"red");
+        this.myButton=new Button(30, 30, 375, 512,"red");
     }
     displayCharacter()
     {
         //console.log("displaying character details");
         myGameArea.context.drawImage(this.image, 10, 10);
-        myGameArea.context.drawImage(this.avatar, 25, 135);
+        myGameArea.context.drawImage(this.avatar, 50, 335);
         myGameArea.context.font = "30px Arial";
         myGameArea.context.fillStyle = "black";
-        myGameArea.context.fillText("Hello World",120, 35);
+        myGameArea.context.fillText("Hello World",360, 300);
         this.myButton.draw();
         
         
     }
     loadGroundLevelGame()
     {
-        let obstacles=[];
-        /*obstacles[0]=new Component(16,871-24,24,56);
-        obstacles[1]=new Component(487-56,16,24,56);
-        obstacles[2]=new Component(535-488,8,28,488);
-        obstacles[3]=new Component(1479-536,16,24,536);
-        obstacles[4]=new Component(16,231-24,24,440);
-        obstacles[5]=new Component(16,231-24,24,536);
-        obstacles[5]=new Component(16,231-24,24,664);*/
+        let obstacles=[];        
+        obstacles[0]=new Component(648,24,84,84);
+        obstacles[1]=new Component(72,12,90,732);
+        obstacles[2]=new Component(1416,24,84,804);
+        obstacles[3]=new Component(24,1272,84,84);
+        obstacles[4]=new Component(24,312,84,660);
+        obstacles[5]=new Component(24,312,84,804);
+        obstacles[6]=new Component(24,312,84,996);
+        obstacles[7]=new Component(24,504,324,1668);
+        obstacles[8]=new Component(456,24,372,84);
+        obstacles[9]=new Component(72,12,378,540);
+        obstacles[10]=new Component(72,24,372,612);
+        obstacles[11]=new Component(552,24,372,996);
+        obstacles[12]=new Component(72,9,379,1548);
+        obstacles[13]=new Component(72,24,372,1620);
 
-        
-        obstacles[0]=new Component(731-84,24,84,84);
-        obstacles[1]=new Component(803-732,12,90,732);
-        obstacles[2]=new Component(2219-804,24,84,804);
-        obstacles[3]=new Component(24,1355-84,84,84);
-        obstacles[4]=new Component(24,395-84,84,660);
-        obstacles[5]=new Component(24,395-84,84,804);
-        obstacles[6]=new Component(24,395-84,84,996);
-        obstacles[7]=new Component(24,827-324,324,1668);
-        obstacles[8]=new Component(539-84,24,372,84);
-        obstacles[9]=new Component(611-540,12,378,540);
-        obstacles[10]=new Component(683-612,24,372,612);
-        obstacles[11]=new Component(1547-996,24,372,996);
-        obstacles[12]=new Component(1619-1548,9,379,1548);
-        obstacles[13]=new Component(1691-1620,24,372,1620);
+        obstacles[14]=new Component(12,42,396,1338);
+        obstacles[15]=new Component(72, 24, 468, 84);
+        obstacles[16]=new Component(72,10,475,156);
+        obstacles[17]=new Component(312,24,468,228);
+        obstacles[18]=new Component(120,120,468,612);
+        obstacles[19]=new Component(24,840,516,1524);
+        obstacles[20]=new Component(204,12,522,1338);
+        obstacles[21]=new Component(12,60,522,1338);
+        obstacles[22]=new Component(24,312,468,372);
+        obstacles[23]=new Component(24,72,468,516);
+        obstacles[24]=new Component(12,348,666,1338);
+        obstacles[25]=new Component(24,72,612,516);
+        obstacles[26]=new Component(103,14,617,372);
+        obstacles[27]=new Component(168,24,756,372);
+		obstacles[28]=new Component(696,24,804,1524);
+        obstacles[29]=new Component(24,120,756,516);
+        obstacles[30]=new Component(10,72,876,523);
+        obstacles[31]=new Component(24,72,948,516);
+        obstacles[32]=new Component(120,120,900,900);
+        obstacles[33]=new Component(204,12,1002,1338);
+        obstacles[34]=new Component(120,24,900,1236);
+        obstacles[35]=new Component(72,312,900,1236);
+        obstacles[36]=new Component(72,10,1003,540);
+        obstacles[37]=new Component(24,360,996,612);
+        obstacles[38]=new Component(60,12,1242,618);
+        obstacles[39]=new Component(204,12,1242,762);
+        obstacles[40]=new Component(12,83,1254,810);
+        obstacles[41]=new Component(12,83,1254,954);
+        obstacles[42]=new Component(571,12,1337,617);
+
+
+
+        obstacles[43]=new Component(38,28,447,1109);
+		obstacles[44]=new Component(3,3,481,1098);
+		obstacles[45]=new Component(80,42,484,1065);
+		
+		obstacles[46]=new Component(91,50,534,1439); //computer
+		obstacles[47]=new Component(35,15,608,1495); //computer
+
+		obstacles[48]=new Component(37,34,679,1494);
+		obstacles[49]=new Component(43,143,721,1348);
+		obstacles[50]=new Component(44,38,774,1394);
+		obstacles[51]=new Component(88,40,963,1398);
+		
+		obstacles[52]=new Component(2,1,867,1210); //trash
+		obstacles[53]=new Component(2,1,868,1211); //trash
+		obstacles[54]=new Component(2,1,869,1212); //trash
+		obstacles[55]=new Component(2,1,870,1213); //trash
+		obstacles[56]=new Component(2,1,871,1214); //trash
+		obstacles[57]=new Component(2,1,872,1215); //trash
+		obstacles[58]=new Component(2,1,873,1216); //trash
+		obstacles[59]=new Component(20,21,874,1202); //trash
+		
+		obstacles[60]=new Component(93,35,871,1249);
+		obstacles[61]=new Component(38,30,921,1205);
+		obstacles[62]=new Component(65,127,1205,1209);
+		obstacles[63]=new Component(32,35,1302,1160);
 
 
         let checkpoints=[];
         checkpoints[0]=new Checkpoint(1619-1548,9,380,1548,"c210");
 
-        this.groundFloorMap=new Map("map",obstacles,checkpoints,[],[]);
+
+        var groundFloorData=["map",obstacles,checkpoints,[],[]];
+        let zeJs=JSON.stringify(groundFloorData);
+        //console.log(zeJs);
+        //var loadedJson=JSON.parse(zeJs);
+        this.groundFloorMap=new MapFromJson(zeJs);
+        //let test=new MapFromJson(zeJs);
+        //console.log(JSON.stringify(groundFloorData));
+        
+        //this.groundFloorMap=new Map("map",obstacles,checkpoints,[],[]);
         this.player=new Player(50,50,275,375,"player");
+
+      
 
         this.player.changeMap(this.groundFloorMap)
 
-        this.player.realX=1270;
-        this.player.realY=700;
+        //this.player.realX=1270;
+        //this.player.realY=700;
+
+        
+        this.player.realX=450;
+        this.player.realY=1550;
 
         //var myJson=JSON.stringify(obstacles);
         //console.log(myJson);
@@ -644,20 +990,23 @@ class gameLogic
         let obstacles=[];
         let checkpoints=[];
         let mapElements=[];
+        this.collectibles=[];
+        
 
         let offsetX=144-48;
         let offsetY=144-48;
-
-        /*let gaps=
+/*let gaps=
         [
-        [1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-        [1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-        [1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-        [1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-        [1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-        [1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,0,0,0,0,0,0,0],
-        [1,1,1,1,1,1,1,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0],
-        [1,1,1,1,1,1,1,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0]
+        [9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9],
+        [9,1,1,1,1,1,1,1,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,9],
+        [9,1,0,0,1,0,0,1,2,2,1,0,0,0,0,0,0,0,0,0,0,0,0,1,9],
+        [9,1,0,1,1,1,0,1,2,2,1,1,1,1,1,1,1,1,1,1,1,1,0,1,9],
+        [9,1,0,0,0,1,0,1,2,2,1,0,0,0,0,0,0,0,0,0,0,0,0,1,9],
+        [9,1,0,1,0,1,0,1,2,2,1,0,1,0,1,1,1,1,1,1,1,1,1,1,9],
+        [9,1,0,1,1,1,0,1,2,2,1,0,1,1,1,0,1,0,0,0,0,0,0,0,9],
+        [9,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,9],
+        [9,1,1,1,1,1,1,1,2,2,0,0,1,1,1,1,1,0,0,0,0,0,0,0,9],
+        [9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9]
         ];*/
 
         let gaps=
@@ -673,62 +1022,63 @@ class gameLogic
         [9,1,1,1,1,1,1,1,2,2,0,0,1,1,1,1,1,0,0,0,0,0,0,0,9],
         [9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9]
         ];
+        let impenetrable=[1,2,9];
 
-        for(let i=1;i<9;i++)
+        /*for(let i=1;i<9;i++)
         {
             for(let j=1;j<24;j++)
             {
                 if(gaps[i][j]==1)
-                    if(Math.floor(Math.random()*3)==2)
+                    if(Math.floor(Math.random()*2)==1)
                     {
-                        //if((i>0)&&(i<7))
-                            //if((j>0)&&(j<23))
                             {
                                 if(((gaps[i][j-1]!=0)||(gaps[i-1][j-1]!=0)||(gaps[i-1][j]!=0))&&((gaps[i-1][j+1]!=0)||(gaps[i][j+1]!=0)||(gaps[i-1][j]!=0))&&((gaps[i][j+1]!=0)||(gaps[i+1][j+1]!=0)||(gaps[i+1][j]!=0))&&((gaps[i+1][j]!=0)||(gaps[i+1][j-1]!=0)||(gaps[i][j-1]!=0)))
                                     gaps[i][j]=0;
                             }
                     }
             }
-            //console.log(gaps[i]);
         }
 
         let gapsCount=0;
         let gapsDirections=[];
         let directions=[];
-        for(let i=1;i<8;i++)
+
+
+
+        for(let i=1;i<9;i++)
         {
-            for(let j=1;j<23;j++)
+            for(let j=1;j<24;j++)
             {
                 gapsDirections=[];
                 gapsCount=0;
-                if(gaps[i][j]==0)
+                if(!impenetrable.includes(gaps[i][j]))
                 {
-                    gapsCount=(gaps[i-1][j]==0?1:0)+(gaps[i+1][j]==0?1:0)+(gaps[i][j-1]==0?1:0)+(gaps[i][j+1]==0?1:0);
+                    gapsCount=(!impenetrable.includes(gaps[i-1][j])?1:0)+(!impenetrable.includes(gaps[i+1][j])?1:0)+(!impenetrable.includes(gaps[i][j-1])?1:0)+(!impenetrable.includes(gaps[i][j+1])?1:0);
                     if(gapsCount>0)
                         if(gapsCount!=2)
                         {
-                            if(gaps[i-1][j]==0)
+                            if(!impenetrable.includes(gaps[i-1][j]))
                                 gapsDirections.push(0);
-                            if(gaps[i+1][j]==0)
+                            if(!impenetrable.includes(gaps[i+1][j]))
                                 gapsDirections.push(1);
-                            if(gaps[i][j-1]==0)
+                            if(!impenetrable.includes(gaps[i][j-1]))
                                 gapsDirections.push(2);
-                            if(gaps[i][j+1]==0)
+                            if(!impenetrable.includes(gaps[i][j+1]))
                                 gapsDirections.push(3);
                             directions.push(new DirectionSwitch(offsetX+48*i,offsetY+48*j,gapsDirections));
                             
                         }
                         else
                         {
-                            if(((gaps[i-1][j]==0)||(gaps[i+1][j]==0))&&((gaps[i][j-1]==0)||(gaps[i][j+1]==0)))
+                            if(((!impenetrable.includes(gaps[i-1][j]))||(!impenetrable.includes(gaps[i+1][j])))&&((!impenetrable.includes(gaps[i][j-1]))||(!impenetrable.includes(gaps[i][j+1]))))
                             {
-                                if(gaps[i-1][j]==0)
+                                if(!impenetrable.includes(gaps[i-1][j]))
                                     gapsDirections.push(0);
-                                if(gaps[i+1][j]==0)
+                                if(!impenetrable.includes(gaps[i+1][j]))
                                     gapsDirections.push(1);
-                                if(gaps[i][j-1]==0)
+                                if(!impenetrable.includes(gaps[i][j-1]))
                                     gapsDirections.push(2);
-                                if(gaps[i][j+1]==0)
+                                if(!impenetrable.includes(gaps[i][j+1]))
                                     gapsDirections.push(3);
                                 directions.push(new DirectionSwitch(offsetX+48*i,offsetY+48*j,gapsDirections));
                             }
@@ -739,8 +1089,8 @@ class gameLogic
             }
         }
 
-        for(let i=0;i<directions.length;i++)
-            console.log(directions[i].x,directions[i].y,directions[i].d);
+        //for(let i=0;i<directions.length;i++)
+          //  console.log(directions[i].x,directions[i].y,directions[i].d);
 
 
         for(let i=0;i<9;i++)
@@ -753,33 +1103,82 @@ class gameLogic
                     obstacles.push(new Component(46,46,offsetX+48*i,offsetY+48*j));
                 }
             }
-        }
+        }*/
 
-        this.c210Map=new Map("c210",obstacles,checkpoints,mapElements,directions);
+
+        let c210Data=["c210",[],checkpoints,gaps,impenetrable,offsetX,offsetY];
+        let c210JSON=JSON.stringify(c210Data);
+        console.log(c210JSON);
+        //var c210FromJson=new MapFromJson(c210JSON);
+
+        //this.c210Map=new Map("c210",obstacles,checkpoints,mapElements,directions);
+
+        this.c210Map=new MapFromJson(c210JSON);
+
+       
+
         this.player.changeMap(this.c210Map);
         this.player.realX=500;
         this.player.realY=600;
         this.player.map=this.c210Map;
 
-        this.mob=new Mob(50,50,334,286,"mobFace",this.c210Map);
+        //288 336
+        //288 288
+        this.mobs=[];
         
+        //this.mob=new Mob(50,50,334,286,"mobFace",this.c210Map);
+        //this.mob2=new Mob(50,50,286,286,"mobFace",this.c210Map);
+        this.mobs.push(new Mob(50,50,334,286,"varlan",this.c210Map));
+        this.mobs.push(new Mob(50,50,286,286,"vlad",this.c210Map));
+
+        this.player.addMobs(this.mobs);
         //constructor(width, height, x, y,textureName,map);
+
+
+        //628 251
+        this.collectibles.push(new Collectible(40,25,299,628,"arduino","arduino"));
+        this.player.defineCollectibles(this.collectibles);
     }
 
     displayC210Map()
     {
         this.player.update();
-        this.mob.update();
+        for(let i=0;i<this.mobs.length;i++)
+            this.mobs[i].update();
+        //this.mob.update();
         this.c210Map.draw(0-(this.player.realX)+this.player.x,0-(this.player.realY)+this.player.y);
-        this.mob.draw(0-(this.player.realX)+this.player.x,0-(this.player.realY)+this.player.y);
 
+        for(let i=0;i<this.collectibles.length;i++)
+            this.collectibles[i].draw(0-(this.player.realX)+this.player.x,0-(this.player.realY)+this.player.y);
+
+        //this.mob.draw(0-(this.player.realX)+this.player.x,0-(this.player.realY)+this.player.y);
+        for(let i=0;i<this.mobs.length;i++)
+            this.mobs[i].draw(0-(this.player.realX)+this.player.x,0-(this.player.realY)+this.player.y);
         
 
         
         this.player.draw();
         
+        if(this.player.hasColidedWithMob()!=-1)
+        {
+            console.log(this.player.hasColidedWithMob());
+            this.state=4;
+        }
+
+        if(this.player.hasColidedWithCollectible()!=-1)
+        {
+            console.log(this.player.hasColidedWithCollectible());
+            if(this.player.hasColidedWithCollectible()=="arduino")
+            {
+                this.collectibles=[];
+                this.player.collectibles=[];
+
+
+            }
+        }
         
     }
+
 }
 
 
