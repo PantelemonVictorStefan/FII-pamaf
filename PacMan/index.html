@@ -6,7 +6,8 @@
 	<link rel="stylesheet" type="text/css" href="css/reset.css">
 	<link rel="stylesheet" type="text/css" href="css/style.css">
 	<link rel="stylesheet" type="text/css" href="css/style.css">
-	<script src="js/main.js"></script>
+	
+	
 </head>
 <body>
 	<div class="container">
@@ -20,7 +21,7 @@
 	  	</header>
 	  	<main class="main">
 			<div class="game" itemscope itemtype="http://schema.org/Game">
-					<canvas class="canvas"></canvas>
+					<canvas id="gameCanvas" class="canvas"></canvas>
 					<div class="authentication">
 							<p>Autentificate cu Facebook pentru a putea juca</p>
 							<button class="loginBtn loginBtn--facebook" onclick="fakeLogin();">
@@ -47,5 +48,27 @@
 	  	</main>
 	  	<footer class="footer"><h6>FII PAMAF 2018 - <span itemprop="contributor">Codrin Popa</span>, <span itemprop="contributor">Victor Pantelemon</span></h6></footer>
 	</div>
+	<div>
+		<img id="legitimatie" src="resources/textures/intro/legitimatie_student.png" style="display:none;"/>
+		<img id="signature" src="resources/textures/intro/signature.png" style="display:none;"/>
+		<img id="avatarImg" src="resources/textures/intro/2.png" style="display:none;"/>
+		<img id="map" src="resources/textures/groundFloor/mapV1.5.png" style="display:none;"/>
+		<img id="player" src="resources/textures/player/playerpicture.png" style="display:none;"/>
+		<img id="c210" src="resources/textures/c210/c210.png" style="display:none;"/>
+		<img id="mobFace" src="resources/textures/c210/mobs/mob.png" style="display:none;"/>
+		<img id="varlan" src="resources/textures/c210/mobs/varlan.jpg" style="display:none;"/>
+		<img id="vlad" src="resources/textures/c210/mobs/vlad.jpg" style="display:none;"/>
+		<img id="victor" src="resources/textures/c210/mobs/victor.png" style="display:none;"/>
+		<img id="gabi" src="resources/textures/c210/mobs/gabi.png" style="display:none;"/>
+		<img id="arduino" src="resources/textures/c210/arduino.png" style="display:none;"/>
+		<img id="raspberry" src="resources/textures/c210/raspberry.png" style="display:none;"/>
+		<img id="obstacle1" src="resources/textures/c210/objects/chair1.png" style="display:none;"/>
+		<img id="obstacle2" src="resources/textures/c210/objects/chair2.png" style="display:none;"/>
+		<img id="obstacle3" src="resources/textures/c210/objects/chair3.png" style="display:none;"/>
+		<img id="obstacle4" src="resources/textures/c210/objects/chair4.png" style="display:none;"/>
+	</div>
+	<script src="js/game.js"></script>
+	<script src="js/main.js"></script>
 </body>
+
 </html>

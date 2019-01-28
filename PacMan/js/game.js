@@ -1,21 +1,13 @@
 class Game{
     constructor()
     {
-        this.canvas = document.createElement("canvas");
+        
+        this.canvas=document.getElementById("gameCanvas");
     }
 
     updateGameArea()
     {
         myGameArea.clear();
-        /*myObstacle.update();
-        myGamePiece.speedX = 0;
-        myGamePiece.speedY = 0;    
-        if (myGameArea.keys && myGameArea.keys[37]) {myGamePiece.speedX = -1; }
-        if (myGameArea.keys && myGameArea.keys[39]) {myGamePiece.speedX = 1; }
-        if (myGameArea.keys && myGameArea.keys[38]) {myGamePiece.speedY = -1; }
-        if (myGameArea.keys && myGameArea.keys[40]) {myGamePiece.speedY = 1; }
-        myGamePiece.newPos();    
-        myGamePiece.update();*/
         logic.runGameLogic();
     }
 
@@ -25,10 +17,12 @@ class Game{
         this.canvas.height = 600;
         this.context = this.canvas.getContext("2d");
         this.canvas.style.background="black";
-        document.body.insertBefore(this.canvas, document.body.childNodes[0]);
+        
         this.interval = setInterval(this.updateGameArea, 20);
         this.mouseX=0;
         this.mouseY=0;
+        this.mouseHoverX=0;
+        this.mouseHoverY=0;
         window.addEventListener('keydown', function (e) {
             myGameArea.keys = (myGameArea.keys || []);
             myGameArea.keys[e.keyCode] = true;
@@ -37,13 +31,17 @@ class Game{
             myGameArea.keys[e.keyCode] = false;
         })
         window.addEventListener('mousedown', function (e) {
-            myGameArea.mouseX = e.pageX;
-            myGameArea.mouseY = e.pageY;
+            myGameArea.mouseX = e.pageX-myGameArea.canvas.offsetLeft;
+            myGameArea.mouseY = e.pageY-myGameArea.canvas.offsetTop;
 
         })
         window.addEventListener('mouseup', function (e) {
             myGameArea.mouseX = false;
             myGameArea.mouseY = false;
+        })
+        window.addEventListener('mousemove', function (e) {
+            myGameArea.mouseHoverX=e.pageX-myGameArea.canvas.offsetLeft;
+            myGameArea.mouseHoverY=e.pageY-myGameArea.canvas.offsetTop;
         })
     }
 
@@ -74,14 +72,14 @@ class Component
 
 class Button extends Component
 {
-    constructor(width, height, x, y,color) 
+    constructor(width, height, x, y,textureName) 
     {
         super(width, height, x, y);
-        this.color=color;
         this.myleft = this.x;
         this.myright = this.x + (this.width);
         this.mytop = this.y;
         this.mybottom = this.y + (this.height);
+        this.texture=document.getElementById(textureName);
     }
 
     clicked () {
@@ -98,9 +96,54 @@ class Button extends Component
 
     draw()
     {
+        if (!((this.mybottom < myGameArea.mouseHoverY) || (this.mytop > myGameArea.mouseHoverY) || (this.myright < myGameArea.mouseHoverX) || (this.myleft > myGameArea.mouseHoverX)))
+        {
         this.ctx = myGameArea.context;
-        this.ctx.fillStyle = this.color;
+        myGameArea.context.drawImage(this.texture,this.x,this.y);
+        //this.ctx.fillStyle = this.color;
+        //this.ctx.fillRect(this.x, this.y, this.width, this.height);
+        }
+    }
+}
+
+class HeaderUI extends Component
+{
+    constructor(width, height, x, y,linesToDisplay)
+    {
+        super(width, height, x, y);
+        this.linesToDisplay=linesToDisplay;
+        this.line=0;
+    }
+
+    draw()
+    {
+        this.ctx = myGameArea.context;
+        this.ctx.fillStyle = "black";
         this.ctx.fillRect(this.x, this.y, this.width, this.height);
+        myGameArea.context.font = "19px Arial";
+        myGameArea.context.fillStyle = "yellow";
+        myGameArea.context.fillText("Objective:",0, 30);
+        myGameArea.context.fillText("Score:",600, 20);
+        myGameArea.context.fillText("Global Score:",550, 45);
+        myGameArea.context.fillStyle = "red";
+        myGameArea.context.fillText(globalScore,675, 45);
+    }
+
+    displayObjective()
+    {
+        myGameArea.context.fillStyle = "yellow";
+        myGameArea.context.fillText(this.linesToDisplay[this.line],100, 30);
+    }
+
+    displayScore(value)
+    {
+        myGameArea.context.fillStyle = "green";
+        myGameArea.context.fillText(value,675, 20);
+    }
+
+    incrementLine()
+    {
+        this.line++;
     }
 }
 
@@ -151,30 +194,21 @@ class MapFromJson extends Map
         let checkpoints=[];
         for(let i=0;i<mapData[1].length;i++)
         {
-            //console.log(mapData[1][i]);
             obstacles.push(new Component(mapData[1][i].width,mapData[1][i].height,mapData[1][i].x,mapData[1][i].y));
         }
 
         for(let i=0;i<mapData[2].length;i++)
         {
-            //console.log(mapData[2][i]);
             checkpoints.push(new Checkpoint(mapData[2][i].width,mapData[2][i].height,mapData[2][i].x,mapData[2][i].y,mapData[2][i].id));
         }
 
         super(mapData[0],obstacles,checkpoints,[],[]);
         this.pierceMap(mapData[3]);
         this.addDirections(this.roomMatrix,mapData[4],mapData[5],mapData[6]);
-        //this.addDir(mapData[4],this.roomMatrix,mapData[5],mapData[6]);
         this.addGeneratedObstacles(mapData[5],mapData[6]);
-        
-
-
-        //console.log(mapData[3]);
-
-        //let c210Data=["c210",obstacles,checkpoints,gaps,impenetrable,offsetX,offsetY];
-
-        
-
+        this.offsetX=mapData[5];
+        this.offsetY=mapData[6];
+        this.collectibles=[];
     }
 
     pierceMap(roomMatrix)
@@ -250,17 +284,58 @@ class MapFromJson extends Map
 
     addGeneratedObstacles(offsetX,offsetY)
     {
+        let elements=["obstacle1","obstacle2","obstacle3","obstacle4"];
+        
         for(let i=1;i<this.roomMatrix.length-1;i++)
         {
             for(let j=1;j<this.roomMatrix[i].length;j++)
             {
                 if(this.roomMatrix[i][j]==1)
                 {
-                    this.mapElements.push(new MapElement(48,48,offsetX+48*i,offsetY+48*j,"obstacle"));
+                    this.mapElements.push(new MapElement(48,48,offsetX+48*i,offsetY+48*j,elements[Math.floor(Math.random() * 4)]));
                     this.obstacles.push(new Component(46,46,offsetX+48*i,offsetY+48*j));
                 }
             }
         }
+    }
+
+    getWalkable()
+    {
+        let walkingZones=[]
+        for(let i=1;i<this.roomMatrix.length-1;i++)
+        {
+            for(let j=1;j<this.roomMatrix[i].length;j++)
+            {
+                if(this.roomMatrix[i][j]==0)
+                {
+                    let point=[]
+                    point[0]=this.offsetX+48*i;
+                    point[1]=this.offsetY+48*j;
+                    walkingZones.push(point);
+                }
+            }
+        }
+        return walkingZones;
+    }
+
+    setCollectibles(collectibles)
+    {
+        this.collectibles=collectibles;
+    }
+
+    removeCollectible(item)
+    {
+        this.collectibles.splice(this.collectibles.indexOf(item),1);
+    }
+
+    draw(x,y)
+    {
+        myGameArea.context.drawImage(this.image,y,x);
+        for(let i=0;i<this.mapElements.length;i++)
+            this.mapElements[i].draw(x,y);
+        for(let i=0;i<this.collectibles.length;i++)
+            this.collectibles[i].draw(x,y);
+        
     }
 
 }
@@ -294,6 +369,11 @@ class Player extends Component
         this.collectibles=[];
     }
 
+    getCollectibles()
+    {
+        this.collectibles=this.map.collectibles;
+    }
+
     addMobs(mobs)
     {
         this.mobs=mobs;
@@ -314,17 +394,12 @@ class Player extends Component
         return -1;
     }
 
-    defineCollectibles(collectibles)
-    {
-        this.collectibles=collectibles;
-    }
-
     hasColidedWithCollectible()
     {
         for(let i=0;i<this.collectibles.length;i++)
         {
             if(this.hasColidedWithObject(this.collectibles[i]))
-                return this.collectibles[i].id;
+                return this.collectibles[i];
         }
         return -1;
     }
@@ -370,13 +445,10 @@ class Player extends Component
     draw()
     {
         myGameArea.context.drawImage(this.texture,this.y,this.x);
-        //console.log(this.realX,this.realY);
     }
 
     update()
     {
-        //if(this.getColidedPart()!=0)
-            //console.log(this.getColidedPart())
         if (myGameArea.keys && myGameArea.keys[87]) 
             {
                 for(let i=0;i<this.speed;i++)
@@ -533,9 +605,6 @@ class DirectionSwitch
         }
         
         return this.d[0];
-        
-
-
     }
 
     getOpposingDirection(dir)
@@ -575,7 +644,6 @@ class Mob extends Component
                     if(colisions[3]==0)
                         this.direction=1;
     }
-
 
     getColidedPart()
     { 
@@ -617,7 +685,6 @@ class Mob extends Component
         return colisions;
     }
 
-
     checkForDirection()
     {
         let direction;
@@ -626,62 +693,48 @@ class Mob extends Component
             direction=this.map.directions[i];
              if((this.x==direction.x-2)&&(this.y==direction.y-2))
             {
-                //console.log("direction at:",direction.x,direction.y);
-                //console.log("old direction:",this.direction);
                 this.direction=direction.changeDirection(this.direction);
-                //console.log("new direction",this.direction);
+                return true;
             }
-                 //console.log("DIRECTION",direction.x,direction.y);
-
         }
+        return false;
     }
+
     update()
     {
-        this.checkForDirection();
-        
-        if (this.direction==0) 
+       
+        for(let i=0;i<this.speed;i++)
+        {
+            this.checkForDirection();
+            if (this.direction==0) 
             {
-                for(let i=0;i<this.speed;i++)
                 {
-                    if(this.getColidedPart()[0]!=1) 
-                        this.x--;
-                    else
-                        break;
-                    
+                        
+                        if(this.getColidedPart()[0]!=1) 
+                            this.x--;
                 }
-                
             }
-        if (this.direction==1)
-        {
-            for(let i=0;i<this.speed;i++)
+            if (this.direction==1)
             {
-                if(this.getColidedPart()[2]!=1)
-                    this.x++;
-                else
-                    break;
-                
+                {
+                    if(this.getColidedPart()[2]!=1)
+                        this.x++;
+                }
             }
-        }
-        if (this.direction==2)
-        {
-            for(let i=0;i<this.speed;i++)
+            if (this.direction==2)
             {
-                if(this.getColidedPart()[3]!=1)
-                    this.y--;
-                else
-                    break;
+                {
                 
+                    if(this.getColidedPart()[3]!=1)
+                        this.y--;
+                }
             }
-        }
-        if (this.direction==3)
-        {
-            for(let i=0;i<this.speed;i++)
+            if (this.direction==3)
             {
-                if(this.getColidedPart()[1]!=1)
-                    this.y++;
-                else
-                    break;
-                
+                {
+                    if(this.getColidedPart()[1]!=1)
+                        this.y++;
+                }
             }
         }
     }
@@ -689,7 +742,6 @@ class Mob extends Component
     draw(x,y)
     {
         myGameArea.context.drawImage(this.texture,y+this.y,x+this.x);
-        //myGameArea.context.drawImage(this.texture,0,0);
     }
 
     isInTheObject(object)
@@ -698,9 +750,6 @@ class Mob extends Component
         let y1=this.y;
         let x2=this.x+this.height-1;
         let y2=this.y+this.width-1;
-
-
-        
         let cx1=object.realX;
         let cy1=object.realY;
         let cx2=object.realX+object.height-1;
@@ -730,11 +779,13 @@ class Mob extends Component
 
 class Collectible extends Component
 {
-    constructor(width,height,x,y,textureName,id)
+    constructor(width,height,x,y,textureName,id,type,scoreValue)
     {
         super(width,height,x,y);
         this.texture=document.getElementById(textureName);
         this.id=id;
+        this.type=type;
+        this.scoreValue=scoreValue;
     }
 
     draw(x,y)
@@ -782,8 +833,6 @@ class Collectible extends Component
 
 }
 
-
-
 class gameLogic
 {
     constructor()
@@ -804,19 +853,37 @@ class gameLogic
             this.displayCharacter()
             if (this.myButton.clicked())
             {
-                console.log("button clicked");
+                //console.log("button clicked");
                 this.state++;
             }
             return 0;
         }
         if(this.state==2)//load ground floor map
         {
-            this.loadGroundLevelGame();
+            
+            if(requestHandler.state=="idle")
+            {
+                requestHandler.sendRequest("resources/maps/json/groundFloorMap.json");
+                return 1;
+            }
+            if(requestHandler.state=="waiting")
+            {
+               if(requestHandler.checkForData())
+               {
+                    this.data=requestHandler.getData();
+               }
+                else
+                {
+                    return 1;
+                }
+            }
+            this.loadGroundLevelGame(this.data);
             this.state++;
             return 0;
         }
         if(this.state==3)//play ground floor map
         {
+            
             let checkpoint=0;
             checkpoint=this.displayGroundLevelMap();
             if(checkpoint=="c210")
@@ -826,7 +893,23 @@ class gameLogic
         }
         if(this.state==4)//load c210 map
         {
-            this.loadC210Map();
+            if(requestHandler.state=="idle")
+            {
+                requestHandler.sendRequest("resources/maps/json/c210.json");
+                return 1;
+            }
+            if(requestHandler.state=="waiting")
+            {
+               if(requestHandler.checkForData())
+               {
+                    this.data=requestHandler.getData();
+               }
+                else
+                {
+                    return 1;
+                }
+            }   
+            this.loadC210Map(this.data);
             this.state++;
             return 0;
         }
@@ -838,14 +921,14 @@ class gameLogic
         
     }
 
-
     loadPlayerDetails()
     {
-        console.log("loaded character details");
+        //console.log("loaded character details");
         this.image=document.getElementById("legitimatie");
         this.avatar=document.getElementById("avatarImg");
-        this.myButton=new Button(30, 30, 375, 512,"red");
+        this.myButton=new Button(172, 67, 296, 479,"signature");
     }
+
     displayCharacter()
     {
         //console.log("displaying character details");
@@ -854,122 +937,27 @@ class gameLogic
         myGameArea.context.font = "30px Arial";
         myGameArea.context.fillStyle = "black";
         myGameArea.context.fillText("Hello World",360, 300);
+        myGameArea.context.font = "bold 35px Arial";
+        myGameArea.context.fillText(globalScore,310, 166);
         this.myButton.draw();
-        
-        
     }
-    loadGroundLevelGame()
+
+    loadGroundLevelGame(data)
     {
-        let obstacles=[];        
-        obstacles[0]=new Component(648,24,84,84);
-        obstacles[1]=new Component(72,12,90,732);
-        obstacles[2]=new Component(1416,24,84,804);
-        obstacles[3]=new Component(24,1272,84,84);
-        obstacles[4]=new Component(24,312,84,660);
-        obstacles[5]=new Component(24,312,84,804);
-        obstacles[6]=new Component(24,312,84,996);
-        obstacles[7]=new Component(24,504,324,1668);
-        obstacles[8]=new Component(456,24,372,84);
-        obstacles[9]=new Component(72,12,378,540);
-        obstacles[10]=new Component(72,24,372,612);
-        obstacles[11]=new Component(552,24,372,996);
-        obstacles[12]=new Component(72,9,379,1548);
-        obstacles[13]=new Component(72,24,372,1620);
-
-        obstacles[14]=new Component(12,42,396,1338);
-        obstacles[15]=new Component(72, 24, 468, 84);
-        obstacles[16]=new Component(72,10,475,156);
-        obstacles[17]=new Component(312,24,468,228);
-        obstacles[18]=new Component(120,120,468,612);
-        obstacles[19]=new Component(24,840,516,1524);
-        obstacles[20]=new Component(204,12,522,1338);
-        obstacles[21]=new Component(12,60,522,1338);
-        obstacles[22]=new Component(24,312,468,372);
-        obstacles[23]=new Component(24,72,468,516);
-        obstacles[24]=new Component(12,348,666,1338);
-        obstacles[25]=new Component(24,72,612,516);
-        obstacles[26]=new Component(103,14,617,372);
-        obstacles[27]=new Component(168,24,756,372);
-		obstacles[28]=new Component(696,24,804,1524);
-        obstacles[29]=new Component(24,120,756,516);
-        obstacles[30]=new Component(10,72,876,523);
-        obstacles[31]=new Component(24,72,948,516);
-        obstacles[32]=new Component(120,120,900,900);
-        obstacles[33]=new Component(204,12,1002,1338);
-        obstacles[34]=new Component(120,24,900,1236);
-        obstacles[35]=new Component(72,312,900,1236);
-        obstacles[36]=new Component(72,10,1003,540);
-        obstacles[37]=new Component(24,360,996,612);
-        obstacles[38]=new Component(60,12,1242,618);
-        obstacles[39]=new Component(204,12,1242,762);
-        obstacles[40]=new Component(12,83,1254,810);
-        obstacles[41]=new Component(12,83,1254,954);
-        obstacles[42]=new Component(571,12,1337,617);
-
-
-
-        obstacles[43]=new Component(38,28,447,1109);
-		obstacles[44]=new Component(3,3,481,1098);
-		obstacles[45]=new Component(80,42,484,1065);
-		
-		obstacles[46]=new Component(91,50,534,1439); //computer
-		obstacles[47]=new Component(35,15,608,1495); //computer
-
-		obstacles[48]=new Component(37,34,679,1494);
-		obstacles[49]=new Component(43,143,721,1348);
-		obstacles[50]=new Component(44,38,774,1394);
-		obstacles[51]=new Component(88,40,963,1398);
-		
-		obstacles[52]=new Component(2,1,867,1210); //trash
-		obstacles[53]=new Component(2,1,868,1211); //trash
-		obstacles[54]=new Component(2,1,869,1212); //trash
-		obstacles[55]=new Component(2,1,870,1213); //trash
-		obstacles[56]=new Component(2,1,871,1214); //trash
-		obstacles[57]=new Component(2,1,872,1215); //trash
-		obstacles[58]=new Component(2,1,873,1216); //trash
-		obstacles[59]=new Component(20,21,874,1202); //trash
-		
-		obstacles[60]=new Component(93,35,871,1249);
-		obstacles[61]=new Component(38,30,921,1205);
-		obstacles[62]=new Component(65,127,1205,1209);
-		obstacles[63]=new Component(32,35,1302,1160);
-
-
-        let checkpoints=[];
-        checkpoints[0]=new Checkpoint(1619-1548,9,380,1548,"c210");
-
-
-        var groundFloorData=["map",obstacles,checkpoints,[],[]];
-        let zeJs=JSON.stringify(groundFloorData);
-        //console.log(zeJs);
-        //var loadedJson=JSON.parse(zeJs);
-        this.groundFloorMap=new MapFromJson(zeJs);
-        //let test=new MapFromJson(zeJs);
-        //console.log(JSON.stringify(groundFloorData));
-        
-        //this.groundFloorMap=new Map("map",obstacles,checkpoints,[],[]);
+        this.groundFloorMap=new MapFromJson(data);
         this.player=new Player(50,50,275,375,"player");
-
-      
-
         this.player.changeMap(this.groundFloorMap)
 
-        //this.player.realX=1270;
-        //this.player.realY=700;
+        this.player.realX=1270;
+        this.player.realY=700;
 
         
-        this.player.realX=450;
-        this.player.realY=1550;
+        //this.player.realX=450;
+        //this.player.realY=1550;
 
-        //var myJson=JSON.stringify(obstacles);
-        //console.log(myJson);
-        
-        //this.mainEntranceX=1270;
-        //this.mainEntranceY=700;
-
-        //this.c210X=420;
-        //this.c210Y=1560;
-        
+        let lines=[];
+        lines.push("Go to C210");
+        this.gameUI=new HeaderUI(800,50,0,0,lines);
     }
     displayGroundLevelMap()
     {
@@ -980,259 +968,186 @@ class gameLogic
         this.player.update();
         this.player.draw();
 
+        this.gameUI.draw();
+        this.gameUI.displayObjective();
+
         if(this.player.getCheckpointColision()!=0)
             if(this.player.getCheckpointColision()=="c210")
                 return "c210";
     }
 
-    loadC210Map()
+    loadC210Map(data)
     {
-        let obstacles=[];
-        let checkpoints=[];
-        let mapElements=[];
         this.collectibles=[];
-        
-
-        let offsetX=144-48;
-        let offsetY=144-48;
-/*let gaps=
-        [
-        [9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9],
-        [9,1,1,1,1,1,1,1,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,9],
-        [9,1,0,0,1,0,0,1,2,2,1,0,0,0,0,0,0,0,0,0,0,0,0,1,9],
-        [9,1,0,1,1,1,0,1,2,2,1,1,1,1,1,1,1,1,1,1,1,1,0,1,9],
-        [9,1,0,0,0,1,0,1,2,2,1,0,0,0,0,0,0,0,0,0,0,0,0,1,9],
-        [9,1,0,1,0,1,0,1,2,2,1,0,1,0,1,1,1,1,1,1,1,1,1,1,9],
-        [9,1,0,1,1,1,0,1,2,2,1,0,1,1,1,0,1,0,0,0,0,0,0,0,9],
-        [9,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,9],
-        [9,1,1,1,1,1,1,1,2,2,0,0,1,1,1,1,1,0,0,0,0,0,0,0,9],
-        [9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9]
-        ];*/
-
-        let gaps=
-        [
-        [9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9],
-        [9,1,1,1,1,1,1,1,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,9],
-        [9,1,0,0,1,0,0,1,2,2,1,0,0,0,0,0,0,0,0,0,0,0,0,1,9],
-        [9,1,0,1,1,1,0,1,2,2,1,1,1,1,1,1,1,1,1,1,1,1,0,1,9],
-        [9,1,0,0,0,1,0,1,2,2,1,0,0,0,0,0,0,0,0,0,0,0,0,1,9],
-        [9,1,0,1,0,1,0,1,2,2,1,0,1,0,1,1,1,1,1,1,1,1,1,1,9],
-        [9,1,0,1,1,1,0,1,2,2,1,0,1,1,1,0,1,0,0,0,0,0,0,0,9],
-        [9,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,9],
-        [9,1,1,1,1,1,1,1,2,2,0,0,1,1,1,1,1,0,0,0,0,0,0,0,9],
-        [9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9]
-        ];
-        let impenetrable=[1,2,9];
-
-        /*for(let i=1;i<9;i++)
-        {
-            for(let j=1;j<24;j++)
-            {
-                if(gaps[i][j]==1)
-                    if(Math.floor(Math.random()*2)==1)
-                    {
-                            {
-                                if(((gaps[i][j-1]!=0)||(gaps[i-1][j-1]!=0)||(gaps[i-1][j]!=0))&&((gaps[i-1][j+1]!=0)||(gaps[i][j+1]!=0)||(gaps[i-1][j]!=0))&&((gaps[i][j+1]!=0)||(gaps[i+1][j+1]!=0)||(gaps[i+1][j]!=0))&&((gaps[i+1][j]!=0)||(gaps[i+1][j-1]!=0)||(gaps[i][j-1]!=0)))
-                                    gaps[i][j]=0;
-                            }
-                    }
-            }
-        }
-
-        let gapsCount=0;
-        let gapsDirections=[];
-        let directions=[];
-
-
-
-        for(let i=1;i<9;i++)
-        {
-            for(let j=1;j<24;j++)
-            {
-                gapsDirections=[];
-                gapsCount=0;
-                if(!impenetrable.includes(gaps[i][j]))
-                {
-                    gapsCount=(!impenetrable.includes(gaps[i-1][j])?1:0)+(!impenetrable.includes(gaps[i+1][j])?1:0)+(!impenetrable.includes(gaps[i][j-1])?1:0)+(!impenetrable.includes(gaps[i][j+1])?1:0);
-                    if(gapsCount>0)
-                        if(gapsCount!=2)
-                        {
-                            if(!impenetrable.includes(gaps[i-1][j]))
-                                gapsDirections.push(0);
-                            if(!impenetrable.includes(gaps[i+1][j]))
-                                gapsDirections.push(1);
-                            if(!impenetrable.includes(gaps[i][j-1]))
-                                gapsDirections.push(2);
-                            if(!impenetrable.includes(gaps[i][j+1]))
-                                gapsDirections.push(3);
-                            directions.push(new DirectionSwitch(offsetX+48*i,offsetY+48*j,gapsDirections));
-                            
-                        }
-                        else
-                        {
-                            if(((!impenetrable.includes(gaps[i-1][j]))||(!impenetrable.includes(gaps[i+1][j])))&&((!impenetrable.includes(gaps[i][j-1]))||(!impenetrable.includes(gaps[i][j+1]))))
-                            {
-                                if(!impenetrable.includes(gaps[i-1][j]))
-                                    gapsDirections.push(0);
-                                if(!impenetrable.includes(gaps[i+1][j]))
-                                    gapsDirections.push(1);
-                                if(!impenetrable.includes(gaps[i][j-1]))
-                                    gapsDirections.push(2);
-                                if(!impenetrable.includes(gaps[i][j+1]))
-                                    gapsDirections.push(3);
-                                directions.push(new DirectionSwitch(offsetX+48*i,offsetY+48*j,gapsDirections));
-                            }
-                        }
-                    //console.log(i,j,":",gapsCount);
-                    //if((gaps[i-1],j==0)&&(gaps[i][j-1]==0)&&(gaps[i],[j+1]==0))||((gaps[i+1],j==0)&&(gaps[i][j-1]==0)&&(gaps[i],[j+1]==0))
-                }
-            }
-        }
-
-        //for(let i=0;i<directions.length;i++)
-          //  console.log(directions[i].x,directions[i].y,directions[i].d);
-
-
-        for(let i=0;i<9;i++)
-        {
-            for(let j=0;j<24;j++)
-            {
-                if(gaps[i][j]==1)
-                {
-                    mapElements.push(new MapElement(48,48,offsetX+48*i,offsetY+48*j,"obstacle"));
-                    obstacles.push(new Component(46,46,offsetX+48*i,offsetY+48*j));
-                }
-            }
-        }*/
-
-
-        let c210Data=["c210",[],checkpoints,gaps,impenetrable,offsetX,offsetY];
-        let c210JSON=JSON.stringify(c210Data);
-        console.log(c210JSON);
-        //var c210FromJson=new MapFromJson(c210JSON);
-
-        //this.c210Map=new Map("c210",obstacles,checkpoints,mapElements,directions);
-
-        this.c210Map=new MapFromJson(c210JSON);
-
-       
+        this.c210Map=new MapFromJson(data);
 
         this.player.changeMap(this.c210Map);
         this.player.realX=500;
-        this.player.realY=600;
+        this.player.realY=598;
         this.player.map=this.c210Map;
 
         //288 336
         //288 288
         this.mobs=[];
-        
-        //this.mob=new Mob(50,50,334,286,"mobFace",this.c210Map);
-        //this.mob2=new Mob(50,50,286,286,"mobFace",this.c210Map);
-        this.mobs.push(new Mob(50,50,334,286,"varlan",this.c210Map));
-        this.mobs.push(new Mob(50,50,286,286,"vlad",this.c210Map));
+        this.mobs.push(new Mob(50,50,310,350,"varlan",this.c210Map));
+        this.mobs.push(new Mob(50,50,310,300,"vlad",this.c210Map));
+        this.mobs[0].direction=3;
+        this.mobs[1].direction=2;
 
         this.player.addMobs(this.mobs);
-        //constructor(width, height, x, y,textureName,map);
 
 
         //628 251
-        this.collectibles.push(new Collectible(40,25,299,628,"arduino","arduino"));
-        this.player.defineCollectibles(this.collectibles);
+        let spawns=this.c210Map.getWalkable();
+        let spawn=spawns[Math.floor((Math.random() * spawns.length) + 1)];
+        this.collectibles.push(new Collectible(40,25,spawn[0],spawn[1],"arduino","arduino","story",30));
+        this.c210Map.setCollectibles(this.collectibles);
+        this.PlayerScore=0;
+
+        this.gameUI.linesToDisplay.push("Find and collect the Arduino to begin");
+        this.gameUI.linesToDisplay.push("Let the fun begin, collect minimum 50 points to win");
+        this.gameUI.linesToDisplay.push("Now you can leave the room or collect more points");
+        this.gameUI.incrementLine();
     }
 
     displayC210Map()
     {
         this.player.update();
+        
         for(let i=0;i<this.mobs.length;i++)
             this.mobs[i].update();
-        //this.mob.update();
         this.c210Map.draw(0-(this.player.realX)+this.player.x,0-(this.player.realY)+this.player.y);
 
-        for(let i=0;i<this.collectibles.length;i++)
-            this.collectibles[i].draw(0-(this.player.realX)+this.player.x,0-(this.player.realY)+this.player.y);
-
-        //this.mob.draw(0-(this.player.realX)+this.player.x,0-(this.player.realY)+this.player.y);
         for(let i=0;i<this.mobs.length;i++)
             this.mobs[i].draw(0-(this.player.realX)+this.player.x,0-(this.player.realY)+this.player.y);
         
 
-        
+        this.player.getCollectibles();
         this.player.draw();
+
+
+
+        this.gameUI.draw();
+        this.gameUI.displayObjective();
+
+        this.gameUI.displayScore(this.PlayerScore);
         
         if(this.player.hasColidedWithMob()!=-1)
         {
-            console.log(this.player.hasColidedWithMob());
+            this.gameUI.line=0;
             this.state=4;
         }
 
-        if(this.player.hasColidedWithCollectible()!=-1)
+        let collectedItem=this.player.hasColidedWithCollectible();
+        if(collectedItem!=-1)
         {
-            console.log(this.player.hasColidedWithCollectible());
-            if(this.player.hasColidedWithCollectible()=="arduino")
+            this.c210Map.removeCollectible(collectedItem);
+            if(collectedItem.type=="story")
+                if(collectedItem.id=="arduino")
+                {
+                    this.gameUI.incrementLine();
+                    this.PlayerScore+=collectedItem.scoreValue;
+                    this.collectibles=[];
+                    let walkable=this.c210Map.getWalkable();
+                    for(let i=0;i<walkable.length;i++)
+                    {
+                        this.collectibles.push(new Collectible(40,25,walkable[i][0],walkable[i][1],"raspberry","arduino"+i,"score",1));
+                    }
+                    this.c210Map.setCollectibles(this.collectibles);
+                    this.mobs.push(new Mob(50,50,502,598,"gabi",this.c210Map));
+                    this.mobs.push(new Mob(50,50,502,598,"victor",this.c210Map));
+                    this.mobs[2].direction=0;
+                    this.mobs[3].direction=0;
+                    this.mobs[0].speed=2;
+                    this.mobs[3].speed=2;
+
+
+
+                }
+            if(collectedItem.type=="score")
             {
-                this.collectibles=[];
-                this.player.collectibles=[];
-
-
+                this.PlayerScore+=collectedItem.scoreValue;
             }
         }
+
+        if(this.PlayerScore>=50)
+        {
+
+            if(this.c210Map.checkpoints.length==0)
+            {
+                this.c210Map.checkpoints.push(new Checkpoint(1619-1548,9,570,588,"c210Exit"));
+                this.gameUI.incrementLine();
+            }
+            this.c210Map.checkpoints[0].draw(0-(this.player.realX)+this.player.x,0-(this.player.realY)+this.player.y);
+            if(this.player.getCheckpointColision()!=0)
+                if(this.player.getCheckpointColision()=="c210Exit")
+                {
+                    globalScore=globalScore+this.PlayerScore;
+                    this.gameUI.line=0;
+                    this.state=3;
+                    this.player.realX=450;
+                    this.player.realY=1550;
+                    this.player.changeMap(this.groundFloorMap);
+                }
+        }
+        
         
     }
 
 }
 
+var rsp="unchanged";
+class RequestHandler
+{
 
+    constructor()
+    {
+        this.data="";
+        this.state="idle";
+        
+    }
 
+    sendRequest(url)
+    {
+        let xmlhttp = new XMLHttpRequest();
+        xmlhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            rsp=this.responseText;
+            console.log("it is done");
+            }
+        };
 
+    
+        xmlhttp.open("GET", url, true);
+        xmlhttp.send(); 
+        this.state="waiting";
+    }
 
+    checkForData()
+    {
+        if(rsp=="unchanged")
+            return false;
+        this.state="completed";
+        return true;
+    }
 
+    getData()
+    {
+        this.state="idle";
+        this.data=rsp;
+        rsp="unchanged";
+        return this.data;
+    }
 
-
-
-
-
-
-
-
-
-
-//var myGamePiece;
-var myGameArea=new Game();
-var logic=new gameLogic();
-
-function startGame() {
-    //myGamePiece = new component(30, 30, "red", 10, 120);
-    myGameArea.start();
-    //myObstacle = new component(10, 200, "green", 300, 120);
     
 }
 
+var globalScore=0;
+var myGameArea=new Game();
+var logic=new gameLogic();
+var requestHandler=new RequestHandler();
 
-
-
-/*class Component
-{
-    constructor(width, height, color, x, y) 
-    {
-        this.width = width;
-        this.height = height;
-        this.speedX = 0;
-        this.speedY = 0;
-        this.x = x;
-        this.y = y;
-        this.color=color;
-    }    
-    draw ()
-    {
-        this.ctx = myGameArea.context;
-        this.ctx.fillStyle = this.color;
-        this.ctx.fillRect(this.x, this.y, this.width, this.height);
-    }
-
-    update()
-    {
-        this.x += this.speedX;
-        this.y += this.speedY;        
-    }
-        
-}*/
+function startGame() {
+    console.log("game started");
+    myGameArea.start();
+}

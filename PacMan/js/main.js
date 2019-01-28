@@ -12,5 +12,6 @@ function hideAll()
 
 function fakeLogin()
 {
-    document.getElementsByClassName("authentication")[0].style.display="none";
+	document.getElementsByClassName("authentication")[0].style.display="none";
+	startGame();
 }
