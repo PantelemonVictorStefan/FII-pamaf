@@ -284,7 +284,7 @@ class MapFromJson extends Map
 
     addGeneratedObstacles(offsetX,offsetY)
     {
-        let elements=["obstacle1","obstacle2","obstacle3","obstacle4"];
+        let elements=["obstacle1","obstacle2","obstacle3","obstacle4","obstacle5"];
         
         for(let i=1;i<this.roomMatrix.length-1;i++)
         {
@@ -292,7 +292,7 @@ class MapFromJson extends Map
             {
                 if(this.roomMatrix[i][j]==1)
                 {
-                    this.mapElements.push(new MapElement(48,48,offsetX+48*i,offsetY+48*j,elements[Math.floor(Math.random() * 4)]));
+                    this.mapElements.push(new MapElement(48,48,offsetX+48*i,offsetY+48*j,elements[Math.floor(Math.random() * elements.length)]));
                     this.obstacles.push(new Component(46,46,offsetX+48*i,offsetY+48*j));
                 }
             }
@@ -833,57 +833,57 @@ class Collectible extends Component
 
 }
 
-var rsp="unchanged";
-class RequestHandler
-{
-
-    constructor()
-    {
-        this.data="";
-        this.state="idle";
-        
-    }
-
-    sendRequest(url)
-    {
-        let xmlhttp = new XMLHttpRequest();
-        xmlhttp.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-            rsp=this.responseText;
-            console.log("it is done");
-            }
-        };
-
-    
-        xmlhttp.open("GET", url, true);
-        xmlhttp.send(); 
-        this.state="waiting";
-    }
-
-    checkForData()
-    {
-        if(rsp=="unchanged")
-            return false;
-        this.state="completed";
-        return true;
-    }
-
-    getData()
-    {
-        this.state="idle";
-        this.data=rsp;
-        rsp="unchanged";
-        return this.data;
-    }
-
-    
-}
-
 class gameLogic
 {
     constructor()
     {
         this.state=0;
+        this.pause=false;
+        if(localStorage.getItem("Score")!=null)
+        {
+            globalScore=Number(localStorage.getItem("Score"));
+        }
+    }
+
+    canPause()
+    {
+        if(this.keyPwasPressed())
+            this.handlePause();
+        if(this.pause)
+        {
+            this.displayPauseScreen();
+            return true;
+        }
+        
+    }
+
+    keyPwasPressed()
+    {
+        if(this.keyP==true)
+        {
+            if (!(myGameArea.keys && myGameArea.keys[80]))
+            {     
+                
+                this.keyP=false;
+                return true;
+            }
+        }
+        if (myGameArea.keys && myGameArea.keys[80])
+            this.keyP=true;
+        return false;
+            
+    }
+
+    handlePause()
+    {
+            if(this.pause==false)
+            {
+                this.pause=true;
+            }
+            else
+            {
+                this.pause=false;
+            }
     }
 
     runGameLogic()
@@ -906,21 +906,31 @@ class gameLogic
         }
         if(this.state==2)//load ground floor map
         {
-            
-            if(requestHandler.state=="idle")
+            if(localStorage.getItem("groundFloorMap")!=null)
             {
-                requestHandler.sendRequest("resources/maps/json/groundFloorMap.json");
-                return 1;
+                this.data=localStorage.getItem("groundFloorMap");
+                console.log("Map loaded from local storage");
             }
-            if(requestHandler.state=="waiting")
+            else
             {
-               if(requestHandler.checkForData())
-               {
-                    this.data=requestHandler.getData();
-               }
-                else
+            
+                if(requestHandler.state=="idle")
                 {
+                    requestHandler.sendRequest("resources/maps/json/groundFloorMap.json");
                     return 1;
+                }
+                if(requestHandler.state=="waiting")
+                {
+                if(requestHandler.checkForData())
+                {
+                        this.data=requestHandler.getData();
+                        localStorage.setItem("groundFloorMap",this.data);
+                        console.log("Map loaded from local server");
+                }
+                    else
+                    {
+                        return 1;
+                    }
                 }
             }
             this.loadGroundLevelGame(this.data);
@@ -929,6 +939,8 @@ class gameLogic
         }
         if(this.state==3)//play ground floor map
         {
+            if(this.canPause())
+                return 0;
             
             let checkpoint=0;
             checkpoint=this.displayGroundLevelMap();
@@ -939,28 +951,40 @@ class gameLogic
         }
         if(this.state==4)//load c210 map
         {
-            if(requestHandler.state=="idle")
+            if(localStorage.getItem("C210Map")!=null)
             {
-                requestHandler.sendRequest("resources/maps/json/c210.json");
-                return 1;
+                this.data=localStorage.getItem("C210Map");
+                console.log("Map loaded from local storage");
             }
-            if(requestHandler.state=="waiting")
+            else
             {
-               if(requestHandler.checkForData())
-               {
-                    this.data=requestHandler.getData();
-               }
-                else
+                if(requestHandler.state=="idle")
                 {
+                    requestHandler.sendRequest("resources/maps/json/c210.json");
                     return 1;
                 }
-            }   
+                if(requestHandler.state=="waiting")
+                {
+                    if(requestHandler.checkForData())
+                    {
+                            this.data=requestHandler.getData();
+                            localStorage.setItem("C210Map",this.data);
+                            console.log("Map loaded from local server");
+                    }
+                    else
+                    {
+                        return 1;
+                    }
+                }
+            }
             this.loadC210Map(this.data);
             this.state++;
             return 0;
         }
         if(this.state==5)//play c210 map
         {
+            if(this.canPause())
+                return 0;
             this.displayC210Map();
             return 0;
         }
@@ -1080,6 +1104,7 @@ class gameLogic
         
         if(this.player.hasColidedWithMob()!=-1)
         {
+            alert("You died!");
             this.gameUI.line=0;
             this.state=4;
         }
@@ -1129,6 +1154,7 @@ class gameLogic
                 if(this.player.getCheckpointColision()=="c210Exit")
                 {
                     globalScore=globalScore+this.PlayerScore;
+                    localStorage.setItem("Score",globalScore);
                     this.gameUI.line=0;
                     this.state=3;
                     this.player.realX=450;
@@ -1140,7 +1166,64 @@ class gameLogic
         
     }
 
+    displayPauseScreen()
+    {
+        myGameArea.context.font = "50px Arial";
+        myGameArea.context.fillStyle = "white";
+        myGameArea.context.fillText("PAUSED",300, 300);
+        myGameArea.context.font = "30px Arial";
+        myGameArea.context.fillText("PRESS P TO RESUME",250, 400);
+    }
+
 }
+
+var rsp="unchanged";
+class RequestHandler
+{
+
+    constructor()
+    {
+        this.data="";
+        this.state="idle";
+        
+    }
+
+    sendRequest(url)
+    {
+        let xmlhttp = new XMLHttpRequest();
+        xmlhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            rsp=this.responseText;
+            console.log("it is done");
+            }
+        };
+
+    
+        xmlhttp.open("GET", url, true);
+        xmlhttp.send(); 
+        this.state="waiting";
+    }
+
+    checkForData()
+    {
+        if(rsp=="unchanged")
+            return false;
+        this.state="completed";
+        return true;
+    }
+
+    getData()
+    {
+        this.state="idle";
+        this.data=rsp;
+        rsp="unchanged";
+        return this.data;
+    }
+
+    
+}
+
+
 
 var globalScore=0;
 var myGameArea=new Game();

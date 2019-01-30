@@ -1,6 +1,7 @@
 function displayMyComponent(component) {
 	hideAll();
-    document.getElementsByClassName(component)[0].style.display="block";
+	logic.pause=true;
+	document.getElementsByClassName(component)[0].style.display="block";
 }
 
 function hideAll()
