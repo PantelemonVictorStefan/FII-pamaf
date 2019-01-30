@@ -284,7 +284,7 @@ class MapFromJson extends Map
 
     addGeneratedObstacles(offsetX,offsetY)
     {
-        let elements=["obstacle1","obstacle2","obstacle3","obstacle4","obstacle5"];
+        let elements=["obstacle1","obstacle2","obstacle3"];
         
         for(let i=1;i<this.roomMatrix.length-1;i++)
         {
@@ -1078,6 +1078,8 @@ class gameLogic
         this.gameUI.linesToDisplay.push("Let the fun begin, collect minimum 50 points to win");
         this.gameUI.linesToDisplay.push("Now you can leave the room or collect more points");
         this.gameUI.incrementLine();
+        
+        this.round=1;
     }
 
     displayC210Map()
@@ -1163,6 +1165,21 @@ class gameLogic
                 }
         }
         
+        if(this.PlayerScore>=100)
+        {
+            if(this.collectibles.length==0)
+            {
+                this.round++;
+                this.mobs.push(new Mob(50,50,502,598,"mobFace",this.c210Map));
+                this.mobs[this.mobs.length-1].direction=0;
+                let walkable=this.c210Map.getWalkable();
+                for(let i=0;i<walkable.length;i++)
+                {
+                    this.collectibles.push(new Collectible(40,25,walkable[i][0],walkable[i][1],"raspberry","arduino"+i,"score",this.round));
+                }
+                this.c210Map.setCollectibles(this.collectibles);
+            }
+        }
         
     }
 
