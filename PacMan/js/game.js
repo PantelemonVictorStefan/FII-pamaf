@@ -833,6 +833,52 @@ class Collectible extends Component
 
 }
 
+var rsp="unchanged";
+class RequestHandler
+{
+
+    constructor()
+    {
+        this.data="";
+        this.state="idle";
+        
+    }
+
+    sendRequest(url)
+    {
+        let xmlhttp = new XMLHttpRequest();
+        xmlhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            rsp=this.responseText;
+            console.log("it is done");
+            }
+        };
+
+    
+        xmlhttp.open("GET", url, true);
+        xmlhttp.send(); 
+        this.state="waiting";
+    }
+
+    checkForData()
+    {
+        if(rsp=="unchanged")
+            return false;
+        this.state="completed";
+        return true;
+    }
+
+    getData()
+    {
+        this.state="idle";
+        this.data=rsp;
+        rsp="unchanged";
+        return this.data;
+    }
+
+    
+}
+
 class gameLogic
 {
     constructor()
@@ -1094,52 +1140,6 @@ class gameLogic
         
     }
 
-}
-
-var rsp="unchanged";
-class RequestHandler
-{
-
-    constructor()
-    {
-        this.data="";
-        this.state="idle";
-        
-    }
-
-    sendRequest(url)
-    {
-        let xmlhttp = new XMLHttpRequest();
-        xmlhttp.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-            rsp=this.responseText;
-            console.log("it is done");
-            }
-        };
-
-    
-        xmlhttp.open("GET", url, true);
-        xmlhttp.send(); 
-        this.state="waiting";
-    }
-
-    checkForData()
-    {
-        if(rsp=="unchanged")
-            return false;
-        this.state="completed";
-        return true;
-    }
-
-    getData()
-    {
-        this.state="idle";
-        this.data=rsp;
-        rsp="unchanged";
-        return this.data;
-    }
-
-    
 }
 
 var globalScore=0;
