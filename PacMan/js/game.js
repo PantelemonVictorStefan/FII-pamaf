@@ -945,7 +945,9 @@ class gameLogic
             let checkpoint=0;
             checkpoint=this.displayGroundLevelMap();
             if(checkpoint=="c210")
-                this.state++;
+                this.state=4;
+            if(checkpoint=="secretariat")
+               this.state=6;
 
             return 0;
         }
@@ -988,6 +990,19 @@ class gameLogic
             this.displayC210Map();
             return 0;
         }
+        if(this.state==6)//load secretariat map
+        {
+            this.loadSecretariatMap();
+            this.state++;
+            return 0;
+        }
+        if(this.state==7)//play secretariat map
+        {
+            if(this.canPause())
+                return 0;
+            this.displaySecretariatMap();
+            return 0;
+        }
         
     }
 
@@ -1026,13 +1041,19 @@ class gameLogic
         //this.player.realY=1550;
 
         let lines=[];
-        lines.push("Go to C210");
+        lines.push("You can go to C210 or to secretariat");
         this.gameUI=new HeaderUI(800,50,0,0,lines);
+
+
+        this.gameUI.linesToDisplay.push("Find the special item to begin");
+        this.gameUI.linesToDisplay.push("Let the fun begin, collect minimum 50 points to win");
+        this.gameUI.linesToDisplay.push("Now you can leave the room or collect more points");
     }
     displayGroundLevelMap()
     {
         this.groundFloorMap.draw(0-(this.player.realX)+this.player.x,0-(this.player.realY)+this.player.y);
-        this.groundFloorMap.checkpoints[0].draw(0-(this.player.realX)+this.player.x,0-(this.player.realY)+this.player.y);
+        for(let i=0;i<this.groundFloorMap.checkpoints.length;i++)
+            this.groundFloorMap.checkpoints[i].draw(0-(this.player.realX)+this.player.x,0-(this.player.realY)+this.player.y);
 
 
         this.player.update();
@@ -1042,8 +1063,7 @@ class gameLogic
         this.gameUI.displayObjective();
 
         if(this.player.getCheckpointColision()!=0)
-            if(this.player.getCheckpointColision()=="c210")
-                return "c210";
+           return this.player.getCheckpointColision();
     }
 
     loadC210Map(data)
@@ -1074,9 +1094,7 @@ class gameLogic
         this.c210Map.setCollectibles(this.collectibles);
         this.PlayerScore=0;
 
-        this.gameUI.linesToDisplay.push("Find and collect the Arduino to begin");
-        this.gameUI.linesToDisplay.push("Let the fun begin, collect minimum 50 points to win");
-        this.gameUI.linesToDisplay.push("Now you can leave the room or collect more points");
+       
         this.gameUI.incrementLine();
         
         this.round=1;
@@ -1181,6 +1199,183 @@ class gameLogic
             }
         }
         
+    }
+
+    loadSecretariatMap()
+    {
+        //let c210Data=["c210",obstacles,checkpoints,gaps,impenetrable,offsetX,offsetY];
+
+       
+
+        let obstacles=[];
+        let impenetrable=[1,2,9];
+        let offsetX=24;
+        let offsetY=24;
+
+
+        obstacles[0]=new Component(601,24,84,83);
+        obstacles[1]=new Component(72,10,91,684);
+        obstacles[2]=new Component(72,24,84,756);
+        obstacles[3]=new Component(24,408,84,83);
+        obstacles[4]=new Component(24,168,84,420);
+        obstacles[5]=new Component(24,168,324,420);
+        obstacles[6]=new Component(24,408,84,804);
+        obstacles[7]=new Component(601+72+72,24,468,83);
+
+        let gaps=
+        [
+        [9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9],
+        [9,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,9],
+        [9,2,1,1,1,1,0,1,2,0,0,0,1,0,0,0,2,9],
+        [9,2,0,0,0,0,0,1,2,0,1,1,1,0,1,0,2,9],
+        [9,2,1,1,1,1,0,1,2,0,0,0,0,0,1,0,2,9],
+        [9,2,0,0,0,0,0,0,0,0,1,1,1,0,1,0,2,9],
+        [9,2,1,0,1,1,1,1,2,0,0,0,0,0,0,0,2,9],
+        [9,2,1,0,0,0,0,0,2,0,1,1,1,1,1,0,2,9],
+        [9,2,1,0,1,1,1,1,2,0,0,0,0,1,0,0,2,9],
+        [9,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,9],
+        [9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9]
+        ];
+
+
+        let secretariatData=["secretariat",obstacles,[],gaps,impenetrable,offsetX,offsetY];
+
+        let secretariatJSON=JSON.stringify(secretariatData);
+        //console.log(c210JSON);
+        //var c210FromJson=new MapFromJson(c210JSON);
+
+        //this.c210Map=new Map("c210",obstacles,checkpoints,mapElements,directions);
+
+        this.map=new MapFromJson(secretariatJSON);
+
+
+        //this.collectibles=[];
+        //this.c210Map=new MapFromJson(data);
+
+        this.player.changeMap(this.map);
+        this.player.realX=114;
+        this.player.realY=696;
+
+        this.mobs=[];
+        this.mobs.push(new Mob(50,50,396,166,"iacob",this.map));
+        this.mobs.push(new Mob(50,50,362,742,"dorel",this.map));
+        this.mobs[0].direction=0;
+        this.mobs[1].direction=0;
+
+        this.player.addMobs(this.mobs);
+
+        this.collectibles=[];
+        let spawns=this.map.getWalkable();
+        let spawn=spawns[Math.floor((Math.random() * spawns.length) + 1)];
+        this.collectibles.push(new Collectible(40,25,spawn[0],spawn[1],"carnet","carnet","story",10));
+        this.map.setCollectibles(this.collectibles);
+        this.PlayerScore=0;
+
+        this.gameUI.incrementLine();
+        
+        this.round=1;
+    }
+
+    displaySecretariatMap()
+    {
+
+
+        this.player.update();
+       
+        
+        for(let i=0;i<this.mobs.length;i++)
+            this.mobs[i].update();
+        this.map.draw(0-(this.player.realX)+this.player.x,0-(this.player.realY)+this.player.y);
+
+        for(let i=0;i<this.mobs.length;i++)
+            this.mobs[i].draw(0-(this.player.realX)+this.player.x,0-(this.player.realY)+this.player.y);
+        
+
+        this.player.getCollectibles();
+        this.player.draw();
+
+
+
+        this.gameUI.draw();
+        this.gameUI.displayObjective();
+
+        this.gameUI.displayScore(this.PlayerScore);
+        
+        if(this.player.hasColidedWithMob()!=-1)
+        {
+            alert("You died!");
+            this.gameUI.line=0;
+            this.state=6;
+        }
+
+        let collectedItem=this.player.hasColidedWithCollectible();
+        if(collectedItem!=-1)
+        {
+            this.map.removeCollectible(collectedItem);
+            if(collectedItem.type=="story")
+                if(collectedItem.id=="carnet")
+                {
+                    this.gameUI.incrementLine();
+                    this.PlayerScore+=collectedItem.scoreValue;
+                    this.collectibles=[];
+                    let walkable=this.map.getWalkable();
+                    for(let i=0;i<walkable.length;i++)
+                    {
+                        this.collectibles.push(new Collectible(40,25,walkable[i][0],walkable[i][1],"folder","folder"+i,"score",1));
+                    }
+                    this.map.setCollectibles(this.collectibles);
+                    this.mobs.push(new Mob(50,50,114,646,"cristian",this.map));
+                    this.mobs[2].direction=1;
+                    this.mobs[0].speed=2;
+
+
+
+                }
+            if(collectedItem.type=="score")
+            {
+                this.PlayerScore+=collectedItem.scoreValue;
+            }
+        }
+
+        if(this.PlayerScore>=50)
+        {
+
+            if(this.map.checkpoints.length==0)
+            {
+                this.map.checkpoints.push(new Checkpoint(1619-1548,9,92,684,"exit"));
+                this.gameUI.incrementLine();
+            }
+            this.map.checkpoints[0].draw(0-(this.player.realX)+this.player.x,0-(this.player.realY)+this.player.y);
+            if(this.player.getCheckpointColision()!=0)
+                if(this.player.getCheckpointColision()=="exit")
+                {
+                    globalScore=globalScore+this.PlayerScore;
+                    localStorage.setItem("Score",globalScore);
+                    this.gameUI.line=0;
+                    this.state=3;
+                    this.player.realX=930;
+                    this.player.realY=560;
+                    this.player.changeMap(this.groundFloorMap);
+                }
+        }
+        
+        if(this.PlayerScore>=100)
+        {
+            if(this.collectibles.length==0)
+            {
+                this.round++;
+                this.mobs.push(new Mob(50,50,114,646,"mobFace",this.map));
+                this.mobs[this.mobs.length-1].direction=0;
+                let walkable=this.map.getWalkable();
+                for(let i=0;i<walkable.length;i++)
+                {
+                    this.collectibles.push(new Collectible(40,25,walkable[i][0],walkable[i][1],"folder","folder"+i,"score",this.round));
+                }
+                this.map.setCollectibles(this.collectibles);
+            }
+        }
+        
+       
     }
 
     displayPauseScreen()
