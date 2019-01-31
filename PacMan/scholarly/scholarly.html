@@ -23,6 +23,7 @@
 					<li><a href="#LocalStorage"><span>7. </span>Local Storage</a></li>
 					<li><a href="#ClassDiagram"><span>8. </span>Class Diagram</a></li>
 					<li><a href="#About Classes"><span>9. </span>Implementation</a></li>
+					<li><a href="#FinalVersion"><span>10. </span>The Final Version</a></li>
 				</ol>
 				<dl>
 					<dt>Authors</dt>
@@ -229,7 +230,71 @@
 					</dd>
 				</dl>
 			</section>
+			<section typeof="sa:FinalVersion" id="FinalVersion">
+				<h2><span>10. </span>The Final Version</h2>
+				
+				<p>
+					The final version of the game include some key features such as: multiple maps linked in one big scrollable map, high detail colisions, game UI, smart generated mazes, survival mode with infinite collectibles, pause menu at any time and local storage for perfomance optimization.
+				</p>
 
+				<dt><h3>Map</h3></dt>
+				<dd>
+					<p>
+						The whole game is composed of multiple levels with loading screens between them. The map of each level
+						is made of one picture with elements added to it to simulate collisions, checkpoints to allow passing from one level to another, collectible elements, AI enemies and invisible markings to help AI entities
+						orientate.
+					</p>
+					<p>
+						The image of the map was made using Dungeon Painter Studio and Adobe Photoshop CC. Various map items are also taken from Dungeon Painter Studio and from Google Images.
+					</p>
+
+					<p>
+						Soon we realized the game main map was too big to fit the 800x600 canvas. So adjustments had to be done. We positionated the player into the center of the canvas and added to it the real coordinate attributes such that when the player is moving, his canvas coordinates stay the same, only the real coordinates attribute change so the map and all the map elements are drawn based on these coordinates. 
+					</p>
+				</dd>
+				<dt><h3>Collisions</h3><dt>
+				<dd>
+					<p>
+						The first idea of implenting collisions was to display everything in a matrix, only the map was too detailed so working with the matrix was too difficult and inefficient.
+					</p>
+					<p>
+						The second idea of implementing collisions was adding every collsion element into an array. The verification of the collisions is made by comparing the coordinates of each element with the coordinates of the player, this method is less efficient than the matrix collision verification but it's much easier to work with it and takes less memory.
+					</p>
+				</dd>
+				<dt><h3>Game UI</h3><dt>
+				<dd>
+					<p>
+						The Game UI is used to display the general objectives and score.
+					</p>
+				</dd>
+				<dt><h3>Level Design & Maze Generation</h3><dt>
+				<dd>
+					<p>
+						For the maze generation we came up with a level design than we complicated with dead ends but also made each space accessible, instead of generating structures and having to prevent the extra empty spaces and inaccessible zones we made an algorithm to generate random empty spaces such that large empty space are not created.
+					</p>
+					<p>
+						The mob spawn zones are predefined to be in a empty space, each empty space is also a spawn for collectibles.
+					</p>
+				</dd>
+				<dt><h3>Survival Mode</h3><dt>
+				<dd>
+					<p>
+						The game devert from the classic PacMan game and comes with an interesting survival mode in which the player has to collect as many point as he can while avoiding enemy AI, the more points he collect the harder the game becomes, whenever he finishes collecting all the points a new set of higher value collectibles are spawned and new enemies appear. There are no boosters so the enemies cannot be defeated. If the player gets caught by the AI all the score made in that level is lost.
+					</p>
+				</dd>
+				<dt><h3>Pause menu</h3></dt>
+				<dd>
+					<p>
+						The game can also be paused by pressing key 'p' but also reading the instructions and description of the game will trigger the pause.
+					</p>
+				</dd>
+				<dt><h3>Local Storage</h3></dt>
+				<dd>
+					<p>
+						Local storage is used to save the player's score between sessions and also to save the game data requiered to generate maps to increase the game performance.
+					</p>
+				</dd>
+			</section>
 		</article>
 	</body>
 </html>
