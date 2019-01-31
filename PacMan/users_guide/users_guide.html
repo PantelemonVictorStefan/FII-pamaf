@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+		<title>Scholarly HTML</title>
+		<link rel="stylesheet" href="css/style.css">
+		<script src="js/gameCore.js"></script>
+	</head>
+	<body prefix="schema: http://schema.org" onload="startGame()">
+		<article typeof="schema:ScholarlyArticle" resource="#">
+			<header>
+				<h1 property="schema:Name">How to use PAMAF (PacMan)</h1>
+			</header>
+			<div role="contentinfo">
+				<ol role="directory">
+					<li><a href="#GameDescription"><span>1. </span>Game Description</a></li>
+					<li><a href="#UserInteraction"><span>2. </span>User Interaction</a></li>
+					<li><a href="#Guide"><span>3. </span>How To Play</a></li>
+				</ol>
+				<dl>
+					<dt>Authors</dt>
+						<dd>
+						<ol>
+				          <li property="schema:author" typeof="sa:ContributorRole">
+				            <a property="schema:author"  typeof="schema:Person">
+				              <span property="schema:givenName">Codrin</span>
+				              <span property="schema:familyName">Popa</span>
+				            </a>
+				            
+				            <sup property="sa:roleContactPoint" typeof="schema:ContactPoint">
+				              <a property="schema:email" href="mailto:pcodrin96@gmail.com" title="corresponding author">&#9993;</a>
+				            </sup>
+				          </li>
+				          <li property="schema:author" typeof="sa:ContributorRole">
+				            <a property="schema:author"  typeof="schema:Person">
+				              <span property="schema:givenName">Victor</span>
+				              <span property="schema:familyName">Pantelemon</span>
+				            </a>
+				            
+				            <sup property="sa:roleContactPoint" typeof="schema:ContactPoint">
+				              <a property="schema:email" href="mailto:pantelemonvictor@gmail.com" title="corresponding author">&#9993;</a>
+				            </sup>
+				          </li>
+				        </ol></dd>
+				        <dt>Faculty</dt>
+						<dd>
+						<ol>
+				          <li id="faculty">
+				            <a href="https://www.info.uaic.ro/bin/Main/" typeof="schema:Faculty">
+				              <span property="schema:name">www.info.uaic.ro</span>
+				            </a>
+				          </li>
+				        </ol></dd>
+					<dt>Bugs &amp; Feedback</dt>
+					<dd>
+						<a href="https://github.com/PantelemonVictorStefan/FII-pamaf/issues" typeof="schema:Feedback">Issues and PRs welcome!</a>
+					</dd>
+				</dl>
+			</div>
+			<section typeof="sa:Description" id="GameDescription" role="doc-description">
+				<h2><span>1. </span>Description</h2>
+				<p>
+					PAMAF is basicly a pacman game which takes places on the hallways of the faculty of computer scinece Alexandru Ioan Cuza from Iasi.
+				</p>
+			</section>
+			<section typeof="sa:UserInteraction" id="UserInteraction">
+				<h2><span>2. </span>User Interaction</h2>
+				<p>
+					After successfully authenticating with facebook the user will find himself in the
+					bidimensional hallways of the body C wandering through 
+					multiple laboratories while being chased by teachers trying to take his soul.
+				</p>
+				<p>
+					Whenever the user feels lost in the commands or has a sudden need to know more about the game and it's creators 
+					he can quickly pause the game and check one of the sections "help" or "about" available in the header without losing the progress.
+				</p>
+			</section>
+
+			<section typeof="sa:Guide" id="Guide">
+				<h2><span>3. </span>How To Play</h2>
+				<figure typeof="sa:Image">
+					<img alt="About" src="images/about.png" style="height:600px;width: 800px"/>
+					<p>
+						Click about to read about the game.
+					</p>
+					<img alt="Help" src="images/help.png" style="height:600px;width: 800px"/>
+					<p>
+						Click help to read the instructions of the game and how to play.
+					</p>
+					<img alt="Home" src="images/home.png" style="height:600px;width: 800px"/>
+					<p>
+						Click home to get to the main screen.
+					</p>
+					<img alt="Start" src="images/Start.png" style="height:600px;width: 800px"/>
+					<p>
+						Click this button to get started.
+					</p>
+					<img alt="Wasd" src="images/wasd.png" style="height:600px;width: 800px"/>
+					<p>
+						If you got here it means you already know the keys but just to be sure WASD to move.
+					</p>
+					<img alt="Pause" src="images/pause.png" style="height:600px;width: 800px"/>
+					<p>
+						This one is self explanatory.
+					</p>
+					<img alt="Checkpoint" src="images/checkpoint.png" style="height:600px;width: 800px"/>
+					<p>
+						You need to get into the yellow zone to trigger the checkpoint.
+					</p>
+					<img alt="Collect" src="images/collect.png" style="height:600px;width: 800px"/>
+					<p>
+						Collect as many as you can.
+					</p>
+					<img alt="Avoid" src="images/avoid.png" style="height:600px;width: 800px"/>
+					<p>
+						Don't let them get too close.
+					</p>
+				</figure>
+			</section>
+
+		</article>
+	</body>
+</html>
